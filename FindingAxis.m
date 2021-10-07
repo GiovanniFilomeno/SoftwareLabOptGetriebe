@@ -1,4 +1,4 @@
-function [EM_start, EM_vector, Anchor] = FindingAxis(file)
+function [EM_start, EM_vector, Anchor,ElectricMotorRadius] = FindingAxis(file)
 
 
     if ~exist(file,'file')
@@ -27,10 +27,10 @@ function [EM_start, EM_vector, Anchor] = FindingAxis(file)
     % lighting, and adjust the material properties to change the specular
     % highlighting.
 
-    patch(fv,'FaceColor',       [0.8 0.8 1.0], ...
-             'EdgeColor',       'none',        ...
-             'FaceLighting',    'gouraud',     ...
-             'AmbientStrength', 0.15);
+%     patch(fv,'FaceColor',       [0.8 0.8 1.0], ...
+%              'EdgeColor',       'none',        ...
+%              'FaceLighting',    'gouraud',     ...
+%              'AmbientStrength', 0.15);
 
     xlabel('X')
     ylabel('Y')
