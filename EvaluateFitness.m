@@ -99,8 +99,8 @@ for i=1:pop
     EC4_SurfCenter(3,:) = Rotation(EC4_SurfCenter(3,:), EC4_center, 2, -EC4_mov(i,1));
     EC4_SurfCenter(4,:) = Rotation(EC4_SurfCenter(4,:), EC4_center, 2, -EC4_mov(i,1));
     
-    figure(i)
-    Visualize(bauraum,gearbox,EC1,EC2,EC3,EC4);
+%     figure(i)
+%     Visualize(bauraum,gearbox,EC1,EC2,EC3,EC4);
     %Checking for collisions
     
     %Components inside the bauraum
