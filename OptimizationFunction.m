@@ -1,0 +1,42 @@
+function fitness = OptimizationFunction(EC1_center, EC1_SurfCenter, EC2_SurfCenter, EC3_SurfCenter, EC4_SurfCenter, EM_start, EM_end, in1_bauraum, in2_bauraum, in3_bauraum, in4_bauraum, out1_gearbox,  out2_gearbox, out3_gearbox, out4_gearbox, collision12, collision13, collision14, collision23, collision24, collision34, EC2_placement) 
+    Pen_gearbox = 10000*5;
+    Pen_bauraum = 5000*5;
+    Pen_collision = 5000*5;
+
+    %IGBT to Electric motor
+    if EC1_center(1,2) > EM_start(1,2) || EC1_center(1,2) < EM_end(1,2)
+         distance = point_to_line(EC1_center, EM_start,EM_end);
+         fitness1 = distance + (1-in1_bauraum)*Pen_bauraum +(out1_gearbox)*Pen_gearbox;
+     else
+         distance = point_to_line(EC1_center, EM_start,EM_end);
+         fitness1 = distance - 135.85 + (1-in1_bauraum)*Pen_bauraum +(out1_gearbox)*Pen_gearbox;
+    end
+ 
+   
+    %Counterclockwise placement of Condensator
+    if EC2_placement == 1       
+        %IGBT to condensator
+            distance = norm(EC1_SurfCenter(1,:) - EC2_SurfCenter(2,:));
+            fitness2 = distance + (1-in2_bauraum)*Pen_bauraum +(out2_gearbox)*Pen_gearbox;
+        %Condensator to EMI-filter    
+            distance = norm(EC2_SurfCenter(1,:) - EC3_SurfCenter(2,:));
+            fitness3 = distance + (1-in3_bauraum)*Pen_bauraum +(out3_gearbox)*Pen_gearbox;
+            
+    %Clockwise placement of Condensator
+    else
+        %IGBT to condensator
+            distance = norm(EC1_SurfCenter(2,:) - EC2_SurfCenter(1,:));
+            fitness2 = distance + (1-in2_bauraum)*Pen_bauraum +(out2_gearbox)*Pen_gearbox;
+        %Condensator to EMI-filter    
+            distance = norm(EC2_SurfCenter(2,:) - EC3_SurfCenter(1,:));
+            fitness3 = distance + (1-in3_bauraum)*Pen_bauraum +(out3_gearbox)*Pen_gearbox;
+    end
+        
+%IGBT to Control board    
+    distance = norm(EC1_SurfCenter(3,:) - EC4_SurfCenter(4,:));
+    fitness4 = distance + (1-in4_bauraum)*Pen_bauraum +(out4_gearbox)*Pen_gearbox;
+    
+    
+    fitness = fitness1 + fitness2 + fitness3 + fitness4 + Pen_collision*collision12 + Pen_collision*collision13 + Pen_collision*collision14 + Pen_collision*collision23 + Pen_collision*collision24 + Pen_collision*collision34;
+
+ end

@@ -1,239 +1,583 @@
-clc
 clear all
+clc
+tStart = cputime;
 
+%% Loading all the solids
+%Read Gearbox
+gearbox = ReadGearbox('Gearbox1.stl');
 
-FV=stlread("Gearbox1.STL");
-V = FV.Points;
-F = FV.ConnectivityList;
-N = faceNormal(FV);
+%Read Assembly space
+bauraum = ReadBauraum('Bauraum.stl');
 
-fv = struct('faces',F,'vertices',V);
+%Read Electric components and define its limits
+[EC1,EC1_length,EC1_width,EC1_height,EC1_center, EC1_SurfCenter] = ReadEC('EC1.stl');
+[EC2,EC2_length,EC2_width,EC2_height,EC2_center, EC2_SurfCenter] = ReadEC('EC2.stl');
+[EC3,EC3_length,EC3_width,EC3_height,EC3_center, EC3_SurfCenter] = ReadEC('EC3.stl');
+[EC4,EC4_length,EC4_width,EC4_height,EC4_center, EC4_SurfCenter] = ReadEC('EC4.stl');
 
-BR=stlread("Bauraum.STL");
-V = BR.Points;
-V2 = 0.004.*V;
-F = BR.ConnectivityList;
-N = faceNormal(BR);
+%% Positioning of the gearbox inside the bauraum
+[EM_start, EM_vector, Anchor, EM_radius] = FindingAxis("Gearbox1.stl");
+EM_end = EM_start + EM_vector;
+zero = [0 0 0];
 
-bauraum = struct('faces',F,'vertices',V2);
+%Definition(manually) of the axis of the bauraum shaft 
+point = [390 409 136.1488];
 
-Cube=stlread("cube.STL");
-V = Cube.Points;
-V2 = .0005.*V;
-F = Cube.ConnectivityList;
-N = faceNormal(Cube);
+%Positioning of the gearbox inside the bauraum and obtaining angle range
+[gearbox, Anchor, EM_start, EM_vector, EM_end, rad_range] = PositionGearbox(bauraum,gearbox,EM_start, EM_vector, Anchor, point, zero);
 
-cube = struct('faces',F,'vertices',V2);
-
-
-BRaum = patch(bauraum,'FaceColor',       [0.8 0 1.0], ...
-         'EdgeColor',       'none',        ...
-         'FaceLighting',    'gouraud',     ...
-         'AmbientStrength', 0.15);
-BRaum.FaceVertexAlphaData = 0.2;    % Set constant transparency 
-BRaum.FaceAlpha = 'flat' ;          % Interpolate to find face transparency
-pause(1)
-shaftx = [fv.vertices(637,1) fv.vertices(638,1)];
-shafty = [fv.vertices(637,2) fv.vertices(638,2)];
-shaftz = [fv.vertices(637,3) fv.vertices(638,3)];
-hold on
-view([45 90 135]);
-pause(1)
-xlabel('X') 
-ylabel('Y')
-zlabel('Z')
-%axis([0 10 0 10 0 10])
-camlight('headlight');
-material('default');
-
-Anchor = fv.vertices(637,:);
-
-point = bauraum.vertices(36,:);
-vector = [bauraum.vertices(43,1)-bauraum.vertices(38,1) bauraum.vertices(43,2)-bauraum.vertices(38,2) bauraum.vertices(43,3)-bauraum.vertices(38,3)];
-anglex = acos(vector(1,1)/norm(vector));
-angley = acos(vector(1,2)/norm(vector));
-anglez = acos(vector(1,3)/norm(vector));
-
-fv.vertices = fv.vertices - Anchor + point;
-Anchor = fv.vertices(637,:);
-shaftx = [fv.vertices(637,1) fv.vertices(637,1) + vector(1,1)];
-shafty = [fv.vertices(637,2) fv.vertices(637,2) + vector(1,2)];
-shaftz = [fv.vertices(637,3) fv.vertices(637,3) + vector(1,3)];
-plot3(shaftx', shafty', shaftz','LineWidth',2,'Color','red')
-pause(2)
-fv.vertices = rotation(fv.vertices,Anchor, 1, anglex);
-fv.vertices = rotation(fv.vertices,Anchor, 2, angley);
-fv.vertices = rotation(fv.vertices,Anchor, 3, anglez);
-fv.vertices = fv.vertices - [0,0,0.1];
-patch(fv,'FaceColor',       [0.8 0.8 1.0], ...
-         'EdgeColor',       'none',        ...
-         'FaceLighting',    'gouraud',     ...
-         'AmbientStrength', 0.15);
-pause(1)
-shaftx = [fv.vertices(637,1) fv.vertices(638,1)];
-shafty = [fv.vertices(637,2) fv.vertices(638,2)];
-shaftz = [fv.vertices(637,3) fv.vertices(638,3)];
-hold on
-plot3(shaftx', shafty', shaftz','LineWidth',2,'Color','red')
-pause(1)
-
-xmax = max(bauraum.vertices(:,1));
-xmin = min(bauraum.vertices(:,1));
-ymax = max(bauraum.vertices(:,2));
-ymin = min(bauraum.vertices(:,2));
-zmax = max(bauraum.vertices(:,3));
-zmin = min(bauraum.vertices(:,3));
-
+%% Genetic Algorithm implementation
 pop = 100;
 iter = 5;
-%Create first sample population and evaluate fitness
-coords = xmin + (xmax-xmin).*rand(pop,1);
-y = ymin + (ymax-ymin).*rand(pop,1);
-z = zmin + (zmax-zmin).*rand(pop,1);
-angles = (2*pi).*rand(pop,3);
-coords = [coords,y,z];
-d = zeros(pop,1);
-in = zeros(pop,1);
-colision = zeros(pop,1);
-for i=1:pop
-    d(i,1) = norm(Anchor-coords(i,:));
-    cube.vertices = cube.vertices - (cube.vertices(1,:) - coords(i,:));
-    cube.vertices = rotation(cube.vertices,cube.vertices(1,:), 1, angles(i,1));
-    cube.vertices = rotation(cube.vertices,cube.vertices(1,:), 2, angles(i,2));
-    cube.vertices = rotation(cube.vertices,cube.vertices(1,:), 3, angles(i,3));
-    IN = inpolyhedron(bauraum,cube.vertices);
-    in(i,1) = sum(IN)/length(IN);
-    IN = inpolyhedron(fv,cube.vertices);
-    colision(i,1) = sum(IN)/length(IN);
-    cube.vertices = rotation(cube.vertices,cube.vertices(1,:), 1, -angles(i,1));
-    cube.vertices = rotation(cube.vertices,cube.vertices(1,:), 2, -angles(i,2));
-    cube.vertices = rotation(cube.vertices,cube.vertices(1,:), 3, -angles(i,3));
+
+%Create initial random population
+[r, y, theta, rotations, EC2_placement ]=InitialPopulation(rad_range,pop,EM_start,EM_vector,EM_radius,EC1_height,EC1_width,EC2_height,EC2_width,EC3_height,EC3_width);
+
+%Evaluate fitness of the first generation
+Fitness = EvaluateFitness(pop,bauraum,gearbox,EC1,EC1_center,EC1_SurfCenter,EC2,EC2_center,EC2_SurfCenter,EC3,EC3_center,EC3_SurfCenter,EC4,EC4_center,EC4_SurfCenter,Anchor,EM_start,EM_vector,r,y,theta,rotations,EC2_placement);
+
+%Sort chromosomes based on their fitness values
+[srt,I]=sort(Fitness);
+
+
+fprintf('Fitness of Generation 1: %d \n',srt(1,1));
+
+%Select the best half of chromosomes from this generation
+bestgb = zeros(pop/2,1);
+best1 = zeros(pop/2,3);
+best2 = zeros(pop/2,3);
+best3 = zeros(pop/2,3);
+best4 = zeros(pop/2,3);
+best_rot1 = zeros(pop/2,1);
+best_rot2 = zeros(pop/2,1);
+best_rot3 = zeros(pop/2,1);
+best_rot4 = zeros(pop/2,1);
+bestcoords1 = zeros(pop/2,3);
+bestcoords2 = zeros(pop/2,3);
+bestcoords3 = zeros(pop/2,3);
+bestcoords4 = zeros(pop/2,3);
+bestd = zeros(pop/2,1);
+best_placement = zeros(pop,2/1);
+for i=1:pop/2
+    bestgb(i,1) = gb_rot(I(i,1),1);
+    best1(i,1) = r1(I(i,1),:);
+    best2(i,1) = r2(I(i,1),:);
+    best3(i,1) = r3(I(i,1),:);
+    best4(i,1) = r4(I(i,1),:);
+    best1(i,2) = y1(I(i,1),:);
+    best2(i,2) = y2(I(i,1),:);
+    best3(i,2) = y3(I(i,1),:);
+    best4(i,2) = y4(I(i,1),:);
+    best1(i,3) = theta1(I(i,1),:);
+    best2(i,3) = theta2(I(i,1),:);
+    best3(i,3) = theta3(I(i,1),:);
+    best4(i,3) = theta4(I(i,1),:);
+    bestcoords1(i,:) = coords1(I(i,1),:);
+    bestcoords2(i,:) = coords2(I(i,1),:);
+    bestcoords3(i,:) = coords3(I(i,1),:);
+    bestcoords4(i,:) = coords4(I(i,1),:);
+    best_rot1(i,1) = EC1_rot(I(i,1),1);
+    best_rot2(i,1) = EC2_rot(I(i,1),1);
+    best_rot3(i,1) = EC3_rot(I(i,1),1);
+    best_rot4(i,1) = EC4_rot(I(i,1),1);
+    bestd(i,1) = d(I(i,1),1);
+    best_placement(i,1) = EC2_placement(I(i,1),1);
 end
-[srt,I]=sort(d);
-for i=1:pop
-    if in(I(i),1) == 1 && colision(I(i),1) == 0
-    best = coords(I(i),:);
-    best_angle = angles(I(i),:);
-    break
-    end
-end
-cube.vertices = cube.vertices - (cube.vertices(1,:) - best(1,:));
-cube.vertices = rotation(cube.vertices,cube.vertices(1,:), 1, best_angle(1,1));
-cube.vertices = rotation(cube.vertices,cube.vertices(1,:), 2, best_angle(1,2));
-cube.vertices = rotation(cube.vertices,cube.vertices(1,:), 3, best_angle(1,3));
 
-patch(cube,'FaceColor',       [0.8 0.8 1.0], ...
-         'EdgeColor',       'none',        ...
-         'FaceLighting',    'gouraud',     ...
-         'AmbientStrength', 0.15);
 
-cube.vertices = rotation(cube.vertices,cube.vertices(1,:), 1, -best_angle(1,1));
-cube.vertices = rotation(cube.vertices,cube.vertices(1,:), 2, -best_angle(1,2));
-cube.vertices = rotation(cube.vertices,cube.vertices(1,:), 3, -best_angle(1,3));
-pause(1)
 
-for g = 2:iter
-     for k = 1: 3: pop
+ for g = 2:iter
+      for k = 1: pop/2
+          
+          
         %Selection
-        sel_coeff = mean(d);
-        parents = zeros(3,3);
-        for j=1:3
+        sel_coeff = d(I(pop/2,1),1);
+        parents1 = zeros(2,3);
+        parents2 = zeros(2,4);
+        parents3 = zeros(2,3);
+        parents4 = zeros(2,3);
+        parents_rot = zeros(2,5);
+        for j=1:2
             rand_sel = 1 + round(pop.*rand());
             for i = rand_sel:pop
-                if d(i,1)<sel_coeff && in(i,1) == 1 && colision(i,1) == 0
-                    parent(j,1) = coords(i,1);
-                    parent(j,2) = coords(i,2);
-                    parent(j,3) = coords(i,3);
+                if d(i,1)<sel_coeff
+                    parents1(j,1) = r1(i,1);
+                    parents1(j,2) = y1(i,1);
+                    parents1(j,3) = theta1(i,1);
+                    parents2(j,1) = r2(i,1);
+                    parents2(j,2) = y2(i,1);
+                    parents2(j,3) = theta2(i,1);
+                    parents2(j,4) = EC2_placement(i,1);
+                    parents3(j,1) = r3(i,1);
+                    parents3(j,2) = y3(i,1);
+                    parents3(j,3) = theta3(i,1);
+                    parents4(j,1) = r4(i,1);
+                    parents4(j,2) = y4(i,1);
+                    parents4(j,3) = theta4(i,1);
+                    parents_rot(j,1) = gb_rot(i,1);
+                    parents_rot(j,2) = EC1_rot(i,1);
+                    parents_rot(j,3) = EC2_rot(i,1);
+                    parents_rot(j,4) = EC3_rot(i,1);
+                    parents_rot(j,5) = EC4_rot(i,1);
+                    
                     break
                 end
             end
         end
-
+ 
         %Crossover
-        child = [parent(1,1) parent(2,2) parent(3,3);parent(1,2) parent(2,3) parent(3,1);parent(1,3) parent(2,1) parent(3,2)];
+        child1 = zeros(2,3);
+        child2 = zeros(2,4);
+        child3 = zeros(2,3);
+        child4 = zeros(2,3);
+        child_rot = zeros(2,5);
+        alpha = 0.15;
+        beta = 0.85;
+        child1(1,1) = alpha.*parents1(1,1) + (1-alpha).*parents1(2,1);
+        child1(2,1) = beta.*parents1(1,1) + (1-beta).*parents1(2,1);
+        child2(1,1) = alpha.*parents2(1,1) + (1-alpha).*parents2(2,1);
+        child2(2,1) = beta.*parents2(1,1) + (1-beta).*parents2(2,1);
+        child3(1,1) = alpha.*parents3(1,1) + (1-alpha).*parents3(2,1);
+        child3(2,1) = beta.*parents3(1,1) + (1-beta).*parents3(2,1);
+        child4(1,1) = alpha.*parents4(1,1) + (1-alpha).*parents4(2,1);
+        child4(2,1) = beta.*parents4(1,1) + (1-beta).*parents4(2,1);
+        
+        child1(1,2) = alpha.*parents1(1,2) + (1-alpha).*parents1(2,2);
+        child1(2,2) = beta.*parents1(1,2) + (1-beta).*parents1(2,2);
+        child2(1,2) = alpha.*parents2(1,2) + (1-alpha).*parents2(2,2);
+        child2(2,2) = beta.*parents2(1,2) + (1-beta).*parents2(2,2);
+        child3(1,2) = alpha.*parents3(1,2) + (1-alpha).*parents3(2,2);
+        child3(2,2) = beta.*parents3(1,2) + (1-beta).*parents3(2,2);
+        child4(1,2) = alpha.*parents4(1,2) + (1-alpha).*parents4(2,2);
+        child4(2,2) = beta.*parents4(1,2) + (1-beta).*parents4(2,2);
+        
+        child1(1,3) = parents1(1,3);
+        child1(2,3) = parents1(2,3);
+        child2(1,3) = parents2(1,3);
+        child2(2,3) = parents2(2,3);
+        child3(1,3) = parents3(1,3);
+        child3(2,3) = parents3(2,3);
+        child4(1,3) = parents4(1,3);
+        child4(2,3) = parents4(2,3);
+        
+        child2(1,4) = parents2(1,4);
+        child2(2,4) = parents2(1,4);
+        
+        child_rot(1,:) = alpha*parents_rot(1,:) + (1-alpha)*parents_rot(2,:);
+        child_rot(2,:) = beta*parents_rot(1,:) + (1-beta)*parents_rot(2,:);
+        
 
 
-
-        %Mutation
-        for i = 1:3
-             for j = 1:3
+%       Mutation
+        for i = 1:2
+            mut_prob = rand();
+            if (mut_prob>=0.75)
+                child1(i,2) = child1(i,2) + 5;
+                child2(i,2) = child2(i,2) + 5;
+                child3(i,2) = child3(i,2) + 5;
+                child4(i,2) = child4(i,2) + 5;
+            elseif (mut_prob>=0.5) && (mut_prob<0.75)
+                child1(i,2) = child1(i,2) - 5;
+                child2(i,2) = child2(i,2) - 5;
+                child3(i,2) = child3(i,2) - 5;
+                child4(i,2) = child4(i,2) - 5;
+            end
+            mut_prob = rand();
+            if (mut_prob>=0.75)
+                child1(i,3) = child1(i,3) + (pi/9)*rand();
+                child2(i,3) = child2(i,3) + (pi/9)*rand();
+                child3(i,3) = child3(i,3) + (pi/9)*rand();
+                child4(i,3) = child1(i,3);
+            elseif (mut_prob>=0.5) && (mut_prob<0.75)
+                child1(i,3) = child1(i,3) - (pi/9)*rand();
+                child2(i,3) = child2(i,3) - (pi/9)*rand();
+                child3(i,3) = child3(i,3) - (pi/9)*rand();
+                child4(i,3) = child1(i,3);
+            end
+            for j=1:5
                 mut_prob = rand();
-                if mut_prob<=0.1
-                    child(i,j) = child(i,j) - (child(i,j)-Anchor(1,j))*(sel_coeff*0.1);                   
+                if mut_prob > 0.5 
+                    child_rot(i,j) = child_rot(i,j) + (pi/36);
+                else
+                    child_rot(i,j) = child_rot(i,j) - (pi/36);
                 end
-             end
+                 
+            end
         end
+        
+        %Write first half of new generation 
+        r1(k,1) = child1(1,1);
+        y1(k,1) = child1(1,2);
+        theta1(k,1) = child1(1,3);
+        r1(k+1,1) = child1(2,1);
+        y1(k+1,1) = child1(2,2);
+        theta1(k+1,1) = child1(2,3);
+        r2(k,1) = child2(1,1);
+        y2(k,1) = child2(1,2);
+        theta2(k,1) = child2(1,3);
+        EC2_placement(k,1) = child2(1,4);
+        r2(k+1,1) = child2(2,1);
+        y2(k+1,1) = child2(2,2);
+        theta2(k+1,1) = child2(2,3);
+        EC2_placement(k+1,1) = child2(2,4);
+        r3(k,1) = child3(1,1);
+        y3(k,1) = child3(1,2);
+        theta3(k,1) = child3(1,3);
+        r3(k+1,1) = child3(2,1);
+        y3(k+1,1) = child3(2,2);
+        theta3(k+1,1) = child3(2,3);
+        r4(k,1) = child4(1,1);
+        y4(k,1) = child4(1,2);
+        theta4(k,1) = child4(1,3);
+        r4(k+1,1) = child4(2,1);
+        y4(k+1,1) = child4(2,2);
+        theta4(k+1,1) = child4(2,3);
+        gb_rot(k,1) = child_rot(1,1);
+        gb_rot(k+1,1) = child_rot(2,1);
+        EC1_rot(k,1) = child_rot(1,2);
+        EC1_rot(k+1,1) = child_rot(2,2);
+        EC2_rot(k,1) = child_rot(1,3);
+        EC2_rot(k+1,1) = child_rot(2,3);
+        EC3_rot(k,1) = child_rot(1,4);
+        EC3_rot(k+1,1) = child_rot(2,4);
+        EC4_rot(k,1) = child_rot(1,5);
+        EC4_rot(k+1,1) = child_rot(2,5);
+      end
+      
+%Write other half of new population from the best of previous generation     
+      for i=(pop/2+1):pop
+          r1(i,1) = best1(i-(pop/2),1);
+          r2(i,1) = best2(i-(pop/2),1);
+          r3(i,1) = best3(i-(pop/2),1);
+          r4(i,1) = best4(i-(pop/2),1);
+          y1(i,1) = best1(i-(pop/2),2);
+          y2(i,1) = best2(i-(pop/2),2);
+          y3(i,1) = best3(i-(pop/2),2);
+          y4(i,1) = best4(i-(pop/2),2);
+          theta1(i,1) = best1(i-(pop/2),3);
+          theta2(i,1) = best2(i-(pop/2),3);
+          theta3(i,1) = best3(i-(pop/2),3);
+          theta4(i,1) = best4(i-(pop/2),3);
+          EC2_placement(i,1) = best_placement(i-(pop/2),1); 
+          gb_rot(i,1) = bestgb(i-(pop/2),1);
+          EC1_rot(i,1) = best_rot1(i-(pop/2),1);
+          EC2_rot(i,1) = best_rot2(i-(pop/2),1);
+          EC3_rot(i,1) = best_rot3(i-(pop/2),1);
+          EC4_rot(i,1) = best_rot4(i-(pop/2),1);
+          coords1(i,:) = bestcoords1(i-(pop/2),1);
+          coords2(i,:) = bestcoords2(i-(pop/2),1);
+          coords3(i,:) = bestcoords3(i-(pop/2),1);
+          coords4(i,:) = bestcoords4(i-(pop/2),1);
+          d(i,1) = bestd(i-(pop/2),1);
+      end
+     
+      for i=1:pop
+        if i==1
+            gb_mov(i) = gb_rot(i);
+        else
+            gb_mov(i) = gb_rot(i) - gb_rot(i-1);
+        end
+      end
+      
+      for i=1:pop
+        if i==1
+            EC1_mov(i) = theta1(i) + EC1_rot(i);
+        else
+            EC1_mov(i) = theta1(i) + EC1_rot(i) - theta1(i-1) - EC1_rot(i-1);
+        end
+      end
+      
+      for i=1:pop
+        if i==1
+            EC2_mov(i) = theta2(i) + EC2_rot(i);
+        else
+            EC2_mov(i) = theta2(i) + EC2_rot(i) - theta2(i-1) - EC2_rot(i-1);
+        end
+      end
+      
+      for i=1:pop
+        if i==1
+            EC3_mov(i) = theta3(i) + EC3_rot(i);
+        else
+            EC3_mov(i) = theta3(i) + EC3_rot(i) - theta3(i-1) - EC3_rot(i-1);
+        end
+      end
+      
+      for i=1:pop
+        if i==1
+            EC4_mov(i) = theta4(i) + EC4_rot(i);
+        else
+            EC4_mov(i) = theta4(i) + EC4_rot(i) - theta4(i-1) - EC4_rot(i-1);
+        end
+      end
+      
+%Test new generation
+        for i=1:pop
+
+            %Move the components and associated variables to the position of that chromosome
+            %Gearbox
+            gearbox.vertices = Rotation(gearbox.vertices, Anchor, 2, gb_mov(i,1));
+            EM_start = Rotation(EM_start, Anchor, 2, gb_mov(i,1));
+            EM_end = EM_start + EM_vector;
+
+            coords1(i,:) = [EM_start(1)+ r1(i).*sin(theta1(i)) y1(i) EM_start(3) + r1(i).*cos(theta1(i))];
+            coords2(i,:) = [EM_start(1)+ r2(i).*sin(theta2(i)) y2(i) EM_start(3) + r2(i).*cos(theta2(i))];
+            coords3(i,:) = [EM_start(1)+ r3(i).*sin(theta3(i)) y3(i) EM_start(3) + r3(i).*cos(theta3(i))];
+            coords4(i,:) = [EM_start(1)+ r4(i).*sin(theta4(i)) y4(i) EM_start(3) + r4(i).*cos(theta4(i))];
+
+            %IGBT
+            EC1.vertices = EC1.vertices - EC1_center + coords1(i,:);
+            EC1_center1 = EC1_center1 - EC1_center + coords1(i,:);
+            EC1_center2 = EC1_center2 - EC1_center + coords1(i,:);
+            EC1_center3 = EC1_center3 - EC1_center + coords1(i,:);
+            EC1_center = coords1(i,:);
+            EC1.vertices = Rotation(EC1.vertices, EC1_center, 2, -EC1_mov(i,1));
+            EC1_center1 = Rotation(EC1_center1, EC1_center, 2, -EC1_mov(i,1));
+            EC1_center2 = Rotation(EC1_center2, EC1_center, 2, -EC1_mov(i,1));
+            EC1_center3 = Rotation(EC1_center3, EC1_center, 2, -EC1_mov(i,1));
+
+            %Capacitor
+            EC2.vertices = EC2.vertices - EC2_center + coords2(i,:);
+            EC2_center1 = EC2_center1 - EC2_center + coords2(i,:);
+            EC2_center2 = EC2_center2 - EC2_center + coords2(i,:);
+            EC2_center = coords2(i,:);
+            EC2.vertices = Rotation(EC2.vertices, EC2_center, 2, -EC2_mov(i,1));
+            EC2_center1 = Rotation(EC2_center1, EC2_center, 2, -EC2_mov(i,1));
+            EC2_center2 = Rotation(EC2_center2, EC2_center, 2, -EC2_mov(i,1));
+
+            %EMI-filter
+            EC3.vertices = EC3.vertices - EC3_center + coords3(i,:);
+            EC3_center1 = EC3_center1 - EC3_center + coords3(i,:);
+            EC3_center = coords3(i,:);
+            EC3.vertices = Rotation(EC3.vertices, EC3_center, 2, -EC3_mov(i,1));
+            EC3_center1 = Rotation(EC3_center1, EC3_center, 2, -EC3_mov(i,1));
+
+            %Control board
+            EC4.vertices = EC4.vertices - EC4_center + coords4(i,:);
+            EC4_center1 = EC4_center1 - EC4_center + coords4(i,:);
+            EC4_center = coords4(i,:);
+            EC4.vertices = Rotation(EC4.vertices, EC4_center, 2, -EC4_mov(i,1));
+            EC4_center1 = Rotation(EC4_center1, EC4_center, 2, -EC4_mov(i,1));
+
+
+            %Checking for collisions
+
+            %Components inside the bauraum
+            IN = inpolyhedron(bauraum,EC1.vertices);
+            in1_bauraum = sum(IN)/length(IN);
+            IN = inpolyhedron(bauraum,EC2.vertices);
+            in2_bauraum = sum(IN)/length(IN);
+            IN = inpolyhedron(bauraum,EC3.vertices);
+            in3_bauraum = sum(IN)/length(IN);
+            IN = inpolyhedron(bauraum,EC4.vertices);
+            in4_bauraum = sum(IN)/length(IN);
+
+            %Components outside the gearbox/EM
+            IN = inpolyhedron(gearbox,EC1.vertices);
+            out1_gearbox = sum(IN)/length(IN);
+            IN = inpolyhedron(gearbox,EC2.vertices);
+            out2_gearbox = sum(IN)/length(IN);
+            IN = inpolyhedron(gearbox,EC3.vertices);
+            out3_gearbox = sum(IN)/length(IN);
+            IN = inpolyhedron(gearbox,EC4.vertices);
+            out4_gearbox = sum(IN)/length(IN);
+
+
+            %Components with themselves
+            IN = inpolyhedron(EC1,EC2.vertices);
+            collision12 = sum(IN)/length(IN);
+            IN = inpolyhedron(EC1,EC3.vertices);
+            collision13 = sum(IN)/length(IN);
+            IN = inpolyhedron(EC1,EC4.vertices);
+            collision14 = sum(IN)/length(IN);
+            IN = inpolyhedron(EC2,EC3.vertices);
+            collision23 = sum(IN)/length(IN);
+            IN = inpolyhedron(EC2,EC4.vertices);
+            collision24 = sum(IN)/length(IN);
+            IN = inpolyhedron(EC3,EC4.vertices);
+            collision34 = sum(IN)/length(IN);
+
+
+            d(i,1) = optimization_function(EC1_center, EC1_center1, EC1_center2, EC1_center3, EC2_center1,EC2_center2, EC3_center1, EC3_center2, EC4_center1, EM_start, EM_end, in1_bauraum, in2_bauraum, in3_bauraum, in4_bauraum, out1_gearbox,  out2_gearbox, out3_gearbox, out4_gearbox, collision12, collision13, collision14, collision23, collision24, collision34, EC2_placement(i));
+
+            hold on     
+%      
+%             figure(i)
+% 
+%             BRaum = patch(bauraum,'FaceColor',       [0 0 1.0], ...
+%                  'EdgeColor',       'none',        ...
+%                  'FaceLighting',    'gouraud',     ...
+%                  'AmbientStrength', 0.15);
+%             BRaum.FaceVertexAlphaData = 0.2;    % Set constant transparency 
+%             BRaum.FaceAlpha = 'flat' ;          % Interpolate to find face transparency
+%             hold on
+%             view([45 90 135]);
+%             xlabel('X') 
+%             ylabel('Y')
+%             zlabel('Z')
+%             %axis([0 10 0 10 0 10])
+%             camlight('headlight');
+%             material('default');
+% 
+%             patch(fv,'FaceColor',       [0.8 0.8 1], ...
+%                  'FaceLighting',    'gouraud',     ...
+%                  'AmbientStrength', 0.15);
+%             plot3(shaftx', shafty', shaftz','LineWidth',2,'Color','red')
+% 
+% 
+%             patch(EC1,'FaceColor',       [0.8 0 0], ...
+%                      'EdgeColor',       'green',        ...
+%                      'FaceLighting',    'gouraud',     ...
+%                      'AmbientStrength', 0.15);
+%             patch(EC2,'FaceColor',       [0 0.8 0], ...
+%                  'EdgeColor',       'red',        ...
+%                  'FaceLighting',    'gouraud',     ...
+%                  'AmbientStrength', 0.15);
+%              patch(EC3,'FaceColor',       [1  1 0], ...
+%                      'EdgeColor',       'black',        ...
+%                      'FaceLighting',    'gouraud',     ...
+%                      'AmbientStrength', 0.15);
+%             patch(EC4,'FaceColor',       [1 0 1], ...
+%                  'EdgeColor',       'yellow',        ...
+%                  'FaceLighting',    'gouraud',     ...
+%                  'AmbientStrength', 0.15);
+% 
+% 
+%             
+        end
+        
+        
+        %Return the gearbox to initial angle
+        gearbox.vertices = Rotation(gearbox.vertices, Anchor, 2, -gb_rot(pop,1));
+        EM_start = Rotation(EM_start, Anchor, 2, -gb_rot(pop,1));
+        EM_end = EM_start + EM_vector;
+
+         %Return components to initial angle
+        EC1.vertices = Rotation(EC1.vertices, EC1_center, 2, theta1(pop,1)+EC1_rot(pop,1));
+        EC1_center1 = Rotation(EC1_center1, EC1_center, 2, EC1_rot(pop,1));
+        EC1_center2 = Rotation(EC1_center2, EC1_center, 2, EC1_rot(pop,1));
+        EC1_center3 = Rotation(EC1_center3, EC1_center, 2, EC1_rot(pop,1));
+
+        EC2.vertices = Rotation(EC2.vertices, EC2_center, 2, theta2(pop,1)+EC2_rot(pop,1));
+        EC2_center1 = Rotation(EC2_center1, EC2_center, 2, EC2_rot(pop,1));
+        EC2_center2 = Rotation(EC2_center2, EC2_center, 2, EC2_rot(pop,1));
+
+        EC3.vertices = Rotation(EC3.vertices, EC3_center, 2, theta3(pop,1)+EC3_rot(pop,1));
+        EC3_center1 = Rotation(EC3_center1, EC3_center, 2, EC3_rot(pop,1));
+
+        EC4.vertices = Rotation(EC4.vertices, EC4_center, 2, theta4(pop,1)+EC4_rot(pop,1));
+        EC4_center1 = Rotation(EC4_center1, EC4_center, 2, EC4_rot(pop,1));
+
+        %Sort chromosomes based on their fitness values
+        [srt,I]=sort(d);
+
 %         
-        %Write new generation 
-        coords(k,1) = child(1,1);
-        coords(k,2) = child(1,2);
-        coords(k,3) = child(1,3);
-        coords(k+1,1) = child(2,1);
-        coords(k+1,2) = child(2,2);
-        coords(k+1,3) = child(2,3);
-        coords(k+2,1) = child(2,1);
-        coords(k+2,2) = child(2,2);
-        coords(k+2,3) = child(2,3);
-     end
-
-    for i=1:pop
-        d(i,1) = norm(Anchor-coords(i,:));
-        cube.vertices = cube.vertices - (cube.vertices(1,:) - coords(i,:));
-        cube.vertices = rotation(cube.vertices,cube.vertices(1,:), 1, angles(i,1));
-        cube.vertices = rotation(cube.vertices,cube.vertices(1,:), 2, angles(i,2));
-        cube.vertices = rotation(cube.vertices,cube.vertices(1,:), 3, angles(i,3));
-        IN = inpolyhedron(bauraum,cube.vertices);
-        in(i,1) = sum(IN)/length(IN);
-        IN = inpolyhedron(fv,cube.vertices);
-        colision(i,1) = sum(IN)/length(IN);
-        cube.vertices = rotation(cube.vertices,cube.vertices(1,:), 1, -angles(i,1));
-        cube.vertices = rotation(cube.vertices,cube.vertices(1,:), 2, -angles(i,2));
-        cube.vertices = rotation(cube.vertices,cube.vertices(1,:), 3, -angles(i,3));
-    end
-    [srt,I]=sort(d);
-    for i=1:pop
-        if in(I(i),1) == 1 && colision(I(i),1) == 0
-        best = coords(I(i),:);
-        best_angle = angles(I(i),:);
-        break
+        for i=1:pop/2
+            bestgb(i,1) = gb_rot(I(i,1),1);
+            best1(i,1) = r1(I(i,1),:);
+            best2(i,1) = r2(I(i,1),:);
+            best3(i,1) = r3(I(i,1),:);
+            best4(i,1) = r4(I(i,1),:);
+            best1(i,2) = y1(I(i,1),:);
+            best2(i,2) = y2(I(i,1),:);
+            best3(i,2) = y3(I(i,1),:);
+            best4(i,2) = y4(I(i,1),:);
+            best1(i,3) = theta1(I(i,1),:);
+            best2(i,3) = theta2(I(i,1),:);
+            best3(i,3) = theta3(I(i,1),:);
+            best4(i,3) = theta4(I(i,1),:);
+            best_rot1(i,1) = EC1_rot(I(i,1),1);
+            best_rot2(i,1) = EC2_rot(I(i,1),1);
+            best_rot3(i,1) = EC3_rot(I(i,1),1);
+            best_rot4(i,1) = EC4_rot(I(i,1),1);
+            bestd(i,1) = d(I(i,1),1);
+            best_placement(i,1) = EC2_placement(I(i,1),1);
         end
-    end
-    cube.vertices = cube.vertices - (cube.vertices(1,:) - best(1,:));
-    cube.vertices = rotation(cube.vertices,cube.vertices(1,:), 1, best_angle(1,1));
-    cube.vertices = rotation(cube.vertices,cube.vertices(1,:), 2, best_angle(1,2));
-    cube.vertices = rotation(cube.vertices,cube.vertices(1,:), 3, best_angle(1,3));
+        
+            if (g==iter)
+        %Prints best solution(of last generation)
+            %Gearbox
+            gearbox.vertices = Rotation(gearbox.vertices, Anchor, 2, gb_rot(I(1,1),1));
+            EM_start = Rotation(EM_start, Anchor, 2, gb_rot(I(1,1),1));
+            EM_end = EM_start + EM_vector;
 
-    patch(cube,'FaceColor',       [0.8 0.8 1.0], ...
-             'EdgeColor',       'none',        ...
-             'FaceLighting',    'gouraud',     ...
-             'AmbientStrength', 0.15);
+            %IGBT
+            EC1.vertices = EC1.vertices - EC1_center + coords1(I(1,1),:);
+            EC1_center1 = EC1_center1 - EC1_center + coords1(I(1,1),:);
+            EC1_center2 = EC1_center2 - EC1_center + coords1(I(1,1),:);
+            EC1_center3 = EC1_center3 - EC1_center + coords1(I(1,1),:);
+            EC1_center = coords1(I(1,1),:);
+            EC1.vertices = Rotation(EC1.vertices, EC1_center, 2, -theta1(I(1,1),1) - EC1_rot(I(1,1),1));
+            EC1_center1 = Rotation(EC1_center1, EC1_center, 2, -theta1(I(1,1),1) - EC1_rot(I(1,1),1));
+            EC1_center2 = Rotation(EC1_center2, EC1_center, 2, -theta1(I(1,1),1) - EC1_rot(I(1,1),1));
+            EC1_center3 = Rotation(EC1_center3, EC1_center, 2, -theta1(I(1,1),1) - EC1_rot(I(1,1),1));
 
-    cube.vertices = rotation(cube.vertices,cube.vertices(1,:), 1, -best_angle(1,1));
-    cube.vertices = rotation(cube.vertices,cube.vertices(1,:), 2, -best_angle(1,2));
-    cube.vertices = rotation(cube.vertices,cube.vertices(1,:), 3, -best_angle(1,3));
-    pause(1)
+            %Capacitor
+            EC2.vertices = EC2.vertices - EC2_center + coords2(I(1,1),:);
+            EC2_center1 = EC2_center1 - EC2_center + coords2(I(1,1),:);
+            EC2_center2 = EC2_center2 - EC2_center + coords2(I(1,1),:);
+            EC2_center = coords2(I(1,1),:);
+            EC2.vertices = Rotation(EC2.vertices, EC2_center, 2, -theta2(I(1,1),1) - EC2_rot(I(1,1),1));
+            EC2_center1 = Rotation(EC2_center1, EC2_center, 2, -theta2(I(1,1),1) - EC2_rot(I(1,1),1));
+            EC2_center2 = Rotation(EC2_center2, EC2_center, 2, -theta2(I(1,1),1) - EC2_rot(I(1,1),1));
+
+            %EMI-filter
+            EC3.vertices = EC3.vertices - EC3_center + coords3(I(1,1),:);
+            EC3_center1 = EC3_center1 - EC3_center + coords3(I(1,1),:);
+            EC3_center = coords3(I(1,1),:);
+            EC3.vertices = Rotation(EC3.vertices, EC3_center, 2, -theta3(I(1,1),1) - EC3_rot(I(1,1),1));
+            EC3_center1 = Rotation(EC3_center1, EC3_center, 2, -theta3(I(1,1),1) - EC3_rot(I(1,1),1));
+
+            %Control board
+            EC4.vertices = EC4.vertices - EC4_center + coords4(I(1,1),:);
+            EC4_center1 = EC4_center1 - EC4_center + coords4(I(1,1),:);
+            EC4_center = coords4(I(1,1),:);
+            EC4.vertices = Rotation(EC4.vertices, EC4_center, 2, -theta4(I(1,1),1) - EC4_rot(I(1,1),1));
+            EC4_center1 = Rotation(EC4_center1, EC4_center, 2, -theta4(I(1,1),1) - EC4_rot(I(1,1),1));
+            
+
+            hold on    
+            figure(pop+1)
+            BRaum = patch(bauraum,'FaceColor',       [0 0 1.0], ...
+                     'EdgeColor',       'none',        ...
+                     'FaceLighting',    'gouraud',     ...
+                     'AmbientStrength', 0.15);
+            BRaum.FaceVertexAlphaData = 0.2;    % Set constant transparency 
+            BRaum.FaceAlpha = 'flat' ;          % Interpolate to find face transparency
+            hold on
+            view([45 90 135]);
+            xlabel('X') 
+            ylabel('Y')
+            zlabel('Z')
+            
+            
+            hold on     
+            patch(gearbox,'FaceColor',       [0.8 0.8 1], ...
+                 'FaceLighting',    'gouraud',     ...
+                 'AmbientStrength', 0.15);
+            plot3(shaftx', shafty', shaftz','LineWidth',2,'Color','red')
+            
+            
+            patch(EC1,'FaceColor',       [0.8 0 0], ...
+                     'EdgeColor',       'green',        ...
+                     'FaceLighting',    'gouraud',     ...
+                     'AmbientStrength', 0.15);
+            patch(EC2,'FaceColor',       [0 0.8 0], ...
+                 'EdgeColor',       'red',        ...
+                 'FaceLighting',    'gouraud',     ...
+                 'AmbientStrength', 0.15);
+             patch(EC3,'FaceColor',       [1  1 0], ...
+                     'EdgeColor',       'black',        ...
+                     'FaceLighting',    'gouraud',     ...
+                     'AmbientStrength', 0.15);
+            patch(EC4,'FaceColor',       [1 0 1], ...
+                 'EdgeColor',       'yellow',        ...
+                 'FaceLighting',    'gouraud',     ...
+                 'AmbientStrength', 0.15); 
+            end
+       fprintf('Selection coefficient of Generation %d: %d \n',g-1,sel_coeff);      
+       fprintf('Fitness of Generation %d: %d \n' ,g,srt(1,1));
+
  end
 
-function vertex = rotation(V, anchor,indice, angle)
-
-    Rz = [ cos(angle), -sin(angle), 0 ;
-          sin(angle), cos(angle), 0 ;
-    0, 0, 1 ];
-    Ry = [ cos(angle), 0, sin(angle) ;
-    0, 1, 0 ;
-          -sin(angle), 0, cos(angle) ];
-    Rx = [ 1, 0, 0 ;
-    0, cos(angle), -sin(angle);
-    0, sin(angle), cos(angle) ];
-
-    if(indice==1)
-           vertex = (V-anchor)*Rx + anchor;
-    end
-    if(indice==2)
-           vertex = (V-anchor)*Ry + anchor;
-    end
-    if(indice==3)
-           vertex = (V-anchor)*Rz + anchor;
-    end
-    
-end 
+tEnd = cputime - tStart
