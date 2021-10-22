@@ -27,8 +27,8 @@ point = [390 409 136.1488];
 [gearbox, Anchor, EM_start, EM_vector, EM_end, rad_range] = PositionGearbox(bauraum,gearbox,EM_start, EM_vector, Anchor, point, zero);
 
 %% Genetic Algorithm implementation
-pop = 40;
-iter = 10;
+pop = 500;
+iter = 20;
 
 %Create initial random population
 [r, y, theta, rotations, EC2_placement ]=InitialPopulation(rad_range,pop,EM_start,EM_vector,EM_radius,EC1_height,EC1_width,EC2_height,EC2_width,EC3_height,EC3_width);
@@ -41,20 +41,20 @@ Fitness = EvaluateFitness(pop,bauraum,gearbox,EC1,EC1_center,EC1_SurfCenter,EC2,
 
 VisualizeBest(1, bauraum, gearbox, Anchor, EC1, EC1_center, EC2, EC2_center, EC3, EC3_center, EC4, EC4_center,EM_start,Fitness,r,y,theta,rotations)
 
-All_Saved_r = [];
-All_Saved_y = [];
-All_Saved_theta = [];
-All_Saved_rotations = [];
+% All_Saved_r = [];
+% All_Saved_y = [];
+% All_Saved_theta = [];
+% All_Saved_rotations = [];
 
 for g=2:iter
 
     %Make Selection, Crossover and Mutation for new generation
     [r,y,theta,rotations,EC2_placement, Fitness] = NewGeneration(pop,g,r,y,theta,rotations,EC2_placement, Fitness);
 
-    All_Saved_r(g-1,:)= r(:);
-    All_Saved_y(g-1,:) = y(:);
-    All_Saved_theta(g-1,:) = theta(:);
-    All_Saved_rotations(g-1,:) = rotations(:);
+%     All_Saved_r(g-1,:)= r(:);
+%     All_Saved_y(g-1,:) = y(:);
+%     All_Saved_theta(g-1,:) = theta(:);
+%     All_Saved_rotations(g-1,:) = rotations(:);
 
     
     %Evaluate new generation

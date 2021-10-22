@@ -12,12 +12,12 @@ best_Fitness = zeros(pop,1);
 best_placement = zeros(pop,1);
 
 for i= (pop/2+1):pop
-    best_r(i,:) = r(I(i,1),:);
-    best_y(i,:) = y(I(i,1),:);
-    best_theta(i,:) = theta(I(i,1),:);
-    best_rotations(i,:) = rotations(I(i,1),:);
-    best_Fitness(i,:) = Fitness(I(i,1),:);
-    best_placement(i,:) = EC2_placement(I(i,1),:);
+    best_r(i,:) = r(I(i-(pop/2),1),:);
+    best_y(i,:) = y(I(i-(pop/2),1),:);
+    best_theta(i,:) = theta(I(i-(pop/2),1),:);
+    best_rotations(i,:) = rotations(I(i-(pop/2),1),:);
+    best_Fitness(i,:) = Fitness(I(i-(pop/2),1),:);
+    best_placement(i,:) = EC2_placement(I(i-(pop/2),1),:);
 end    
     
 for k = 1:2:pop/2
@@ -201,5 +201,6 @@ y = best_y;
 theta = best_theta;
 rotations = best_rotations;
 EC2_placement = best_placement;
+Fitness = best_Fitness;
     
 end
