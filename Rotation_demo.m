@@ -27,28 +27,30 @@ point = [390 409 136.1488];
 [gearbox, Anchor, EM_start, EM_vector, EM_end, rad_range] = PositionGearbox(bauraum,gearbox,EM_start, EM_vector, Anchor, point, zero);
 
 %% Genetic Algorithm implementation
-pop = 500;
-iter = 20;
+pop = 200;
+iter = 10;
 
 %Create initial random population
 [r, y, theta, rotations, EC2_placement ]=InitialPopulation(rad_range,pop,EM_start,EM_vector,EM_radius,EC1_height,EC1_width,EC2_height,EC2_width,EC3_height,EC3_width);
 
 %Array that contain the fitness of the chromosome
 Fitness = zeros(pop,1);
-
+g = 0;
 %Evaluate fitness of the first generation
-Fitness = EvaluateFitness(pop,bauraum,gearbox,EC1,EC1_center,EC1_SurfCenter,EC2,EC2_center,EC2_SurfCenter,EC3,EC3_center,EC3_SurfCenter,EC4,EC4_center,EC4_SurfCenter,Anchor,EM_start,EM_vector,r,y,theta,rotations,EC2_placement, Fitness);
+Fitness = EvaluateFitness(g,pop,bauraum,gearbox,EC1,EC1_center,EC1_SurfCenter,EC2,EC2_center,EC2_SurfCenter,EC3,EC3_center,EC3_SurfCenter,EC4,EC4_center,EC4_SurfCenter,Anchor,EM_start,EM_vector,r,y,theta,rotations,EC2_placement, Fitness);
 
-VisualizeBest(1, bauraum, gearbox, Anchor, EC1, EC1_center, EC2, EC2_center, EC3, EC3_center, EC4, EC4_center,EM_start,Fitness,r,y,theta,rotations)
+% VisualizeBest(1, bauraum, gearbox, Anchor, EC1, EC1_center, EC2, EC2_center, EC3, EC3_center, EC4, EC4_center,EM_start,Fitness,r,y,theta,rotations)
 
 % All_Saved_r = [];
 % All_Saved_y = [];
 % All_Saved_theta = [];
 % All_Saved_rotations = [];
 
+
 for g=2:iter
 
     %Make Selection, Crossover and Mutation for new generation
+    
     [r,y,theta,rotations,EC2_placement, Fitness] = NewGeneration(pop,g,r,y,theta,rotations,EC2_placement, Fitness);
 
 %     All_Saved_r(g-1,:)= r(:);
@@ -58,13 +60,21 @@ for g=2:iter
 
     
     %Evaluate new generation
-    Fitness = EvaluateFitness(pop/2,bauraum,gearbox, EC1,EC1_center,EC1_SurfCenter,EC2,EC2_center,EC2_SurfCenter,EC3,EC3_center,EC3_SurfCenter,EC4,EC4_center,EC4_SurfCenter,Anchor,EM_start,EM_vector,r,y,theta,rotations,EC2_placement, Fitness);
+    Fitness = EvaluateFitness(g,pop/2,bauraum,gearbox, EC1,EC1_center,EC1_SurfCenter,EC2,EC2_center,EC2_SurfCenter,EC3,EC3_center,EC3_SurfCenter,EC4,EC4_center,EC4_SurfCenter,Anchor,EM_start,EM_vector,r,y,theta,rotations,EC2_placement, Fitness);
     
-    VisualizeBest(g, bauraum, gearbox, Anchor, EC1, EC1_center, EC2, EC2_center, EC3, EC3_center, EC4, EC4_center,EM_start,Fitness,r,y,theta,rotations)
+    
+   
+%     VisualizeBest(g, bauraum, gearbox, Anchor, EC1, EC1_center, EC2, EC2_center, EC3, EC3_center, EC4, EC4_center,EM_start,Fitness,r,y,theta,rotations)
+
 end
 
 [srt,I]=sort(Fitness);
 
 fprintf('Fitness of Generation %d: %d \n',iter,srt(1,1));
+
+
+
+
+
 
 tEnd = cputime - tStart

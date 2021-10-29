@@ -68,7 +68,7 @@ for i= 1:360
 end
 
 valid_angles = [];
-max_IN = max(out_gearbox)
+max_IN = max(out_gearbox);
 
 
 for i= 1:360

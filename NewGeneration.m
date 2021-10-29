@@ -101,15 +101,15 @@ for k = 1:2:pop/2
     for i = 1:2
         mut_prob = rand();
         if (mut_prob>=0.75)
-            child1(i,2) = child1(i,2) + 5;
-            child2(i,2) = child2(i,2) + 5;
-            child3(i,2) = child3(i,2) + 5;
-            child4(i,2) = child4(i,2) + 5;
+            child1(i,2) = child1(i,2) + 50*rand();
+            child2(i,2) = child2(i,2) + 50*rand();
+            child3(i,2) = child3(i,2) + 50*rand();
+            child4(i,2) = child4(i,2) + 50*rand();
         elseif (mut_prob>=0.5) && (mut_prob<0.75)
-            child1(i,2) = child1(i,2) - 5;
-            child2(i,2) = child2(i,2) - 5;
-            child3(i,2) = child3(i,2) - 5;
-            child4(i,2) = child4(i,2) - 5;
+            child1(i,2) = child1(i,2) - 50*rand();
+            child2(i,2) = child2(i,2) - 50*rand();
+            child3(i,2) = child3(i,2) - 50*rand();
+            child4(i,2) = child4(i,2) - 50*rand();
         end
         mut_prob = rand();
         if (mut_prob>=0.75)
@@ -173,34 +173,11 @@ for k = 1:2:pop/2
     best_rotations(k+1,5) = child_rot(2,5);
 
 end
-
-%Write other half of new population from the best of previous generation     
-% for i=(pop/2+1):pop
-%     r(i,1) = best_r(i-(pop/2),1);
-%     r(i,2) = best_r(i-(pop/2),2);
-%     r(i,3) = best_r(i-(pop/2),3);
-%     r(i,4) = best_r(i-(pop/2),4);
-%     y(i,1) = best_y(i-(pop/2),1);
-%     y(i,2) = best_y(i-(pop/2),2);
-%     y(i,3) = best_y(i-(pop/2),3);
-%     y(i,4) = best_y(i-(pop/2),4);
-%     theta(i,1) = best_theta(i-(pop/2),1);
-%     theta(i,1) = best_theta(i-(pop/2),2);
-%     theta(i,1) = best_theta(i-(pop/2),3);
-%     theta(i,1) = best_theta(i-(pop/2),4);
-%     EC2_placement(i,1) = best_placement(i-(pop/2),1); 
-%     rotations(i,1) = best_rotations(i-(pop/2),1);
-%     rotations(i,2) = best_rotations(i-(pop/2),2);
-%     rotations(i,3) = best_rotations(i-(pop/2),3);
-%     rotations(i,4) = best_rotations(i-(pop/2),4);
-%     rotations(i,5) = best_rotations(i-(pop/2),5);
-%     Fitness(i,1) = best_Fitness(i-(pop/2),1);
-% end
 r = best_r;
 y = best_y;
 theta = best_theta;
 rotations = best_rotations;
 EC2_placement = best_placement;
 Fitness = best_Fitness;
-    
+
 end

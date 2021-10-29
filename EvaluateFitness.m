@@ -1,4 +1,4 @@
-function Fitness = EvaluateFitness(pop,bauraum,gearbox,EC1,EC1_center,EC1_SurfCenter,EC2,EC2_center,EC2_SurfCenter,EC3,EC3_center,EC3_SurfCenter,EC4,EC4_center,EC4_SurfCenter,Anchor,EM_start,EM_vector,r,y,theta,Rotations,EC2_placement, Fitness)
+function Fitness = EvaluateFitness(g,pop,bauraum,gearbox,EC1,EC1_center,EC1_SurfCenter,EC2,EC2_center,EC2_SurfCenter,EC3,EC3_center,EC3_SurfCenter,EC4,EC4_center,EC4_SurfCenter,Anchor,EM_start,EM_vector,r,y,theta,Rotations,EC2_placement, Fitness)
 
 
 for i=1:pop
@@ -96,9 +96,17 @@ for i=1:pop
     EC4_SurfCenter(3,:) = Rotation(EC4_SurfCenter(3,:), EC4_center, 2, -EC4_mov(i,1));
     EC4_SurfCenter(4,:) = Rotation(EC4_SurfCenter(4,:), EC4_center, 2, -EC4_mov(i,1));
     
-%     figure(i)
-%     Visualize(bauraum,gearbox,EC1,EC2,EC3,EC4);
+    cable_radius = 2.3;
+    radius_of_curvature = 13.8; 
+    
+    
+
     %Checking for collisions
+    
+    %Gearbox and bauraum
+    IN = inpolyhedron(bauraum,gearbox.vertices);
+    bauraum_gearbox = sum(IN)/length(IN);
+    
     
     %Components inside the bauraum
     IN = inpolyhedron(bauraum,EC1.vertices);
@@ -135,8 +143,63 @@ for i=1:pop
     IN = inpolyhedron(EC3,EC4.vertices);
     collision34 = sum(IN)/length(IN);
         
-    Fitness(i,1) = OptimizationFunction(EC1_center, EC1_SurfCenter, EC2_SurfCenter, EC3_SurfCenter, EC4_SurfCenter, EM_start, EM_end, in1_bauraum, in2_bauraum, in3_bauraum, in4_bauraum, out1_gearbox,  out2_gearbox, out3_gearbox, out4_gearbox, collision12, collision13, collision14, collision23, collision24, collision34, EC2_placement(i,1)); 
+    Fitness(i,1) = OptimizationFunction(bauraum_gearbox, EC1_center, EC1_SurfCenter, EC2_SurfCenter, EC3_SurfCenter, EC4_SurfCenter, EM_start, EM_end, in1_bauraum, in2_bauraum, in3_bauraum, in4_bauraum, out1_gearbox,  out2_gearbox, out3_gearbox, out4_gearbox, collision12, collision13, collision14, collision23, collision24, collision34, EC2_placement(i,1)); 
 
+    
+%     if g == 10
+%         figure(i+1)
+%         Visualize(bauraum,gearbox,EC1,EC2,EC3,EC4);
+%         hold on
+%     end
+       
+    if g == 10
+        Clearance = 5;
+        if Fitness(i,1) < 200
+            figure(i+1)
+            Visualize(bauraum,gearbox,EC1,EC2,EC3,EC4);
+            hold on
+            if EC2_placement == 1   %Counterclockwise        
+
+                vector1 = EC1_SurfCenter(2,:) - EC1_SurfCenter(1,:);
+                vector2 = EC2_SurfCenter(1,:) - EC2_SurfCenter(2,:);
+                pt2 = EC1_SurfCenter(1,:) - (Clearance.*vector1)/norm(vector1);
+                pt3 = EC2_SurfCenter(2,:) - (Clearance.*vector2)/norm(vector2);
+                [splinelength,max_curvature, curvature, collisionwith1, collisionwith2] = spline_connection (EC1_SurfCenter(1,:), pt2, pt3, EC2_SurfCenter(2,:),EC1_center, EC2_center, EC1, EC2, cable_radius, radius_of_curvature);
+                vector1 = EC2_SurfCenter(2,:) - EC2_SurfCenter(1,:);
+                vector2 = EC3_SurfCenter(1,:) - EC3_SurfCenter(2,:);
+                pt2 = EC2_SurfCenter(1,:) - (Clearance.*vector1)/norm(vector1);
+                pt3 = EC3_SurfCenter(2,:) - (Clearance.*vector2)/norm(vector2);
+                [splinelength,max_curvature, curvature, collisionwith1, collisionwith2] = spline_connection (EC2_SurfCenter(1,:), pt2, pt3, EC3_SurfCenter(2,:),EC2_center, EC3_center, EC2, EC3, cable_radius, radius_of_curvature);
+                vector1 = EC1_SurfCenter(4,:) - EC1_SurfCenter(3,:);
+                vector2 = EC4_SurfCenter(3,:) - EC4_SurfCenter(4,:);
+                pt2 = EC1_SurfCenter(3,:) - (Clearance.*vector1)/norm(vector1);
+                pt3 = EC4_SurfCenter(4,:) - (Clearance.*vector2)/norm(vector2);
+                [splinelength,max_curvature, curvature, collisionwith1, collisionwith2] = spline_connection (EC1_SurfCenter(3,:), pt2, pt3, EC4_SurfCenter(4,:),EC1_center, EC4_center, EC1, EC4, cable_radius, radius_of_curvature);
+
+            else                    %Clockwise
+
+                vector1 = EC1_SurfCenter(1,:) - EC1_SurfCenter(2,:);
+                vector2 = EC2_SurfCenter(2,:) - EC2_SurfCenter(1,:);
+                pt2 = EC1_SurfCenter(2,:) - (Clearance.*vector1)/norm(vector1);
+                pt3 = EC2_SurfCenter(1,:) - (Clearance.*vector2)/norm(vector2);        
+                [splinelength,max_curvature, curvature, collisionwith1, collisionwith2] = spline_connection (EC1_SurfCenter(2,:), pt2, pt3, EC2_SurfCenter(1,:),EC1_center, EC2_center, EC1, EC2, cable_radius, radius_of_curvature);
+                vector1 = EC2_SurfCenter(1,:) - EC2_SurfCenter(2,:);
+                vector2 = EC3_SurfCenter(2,:) - EC3_SurfCenter(1,:);
+                pt2 = EC2_SurfCenter(2,:) - (Clearance.*vector1)/norm(vector1);
+                pt3 = EC3_SurfCenter(1,:) - (Clearance.*vector2)/norm(vector2);        
+                [splinelength,max_curvature, curvature, collisionwith1, collisionwith2] = spline_connection (EC2_SurfCenter(2,:), pt2, pt3, EC3_SurfCenter(1,:),EC2_center, EC3_center, EC2, EC3, cable_radius, radius_of_curvature);
+                vector1 = EC1_SurfCenter(4,:) - EC1_SurfCenter(3,:);
+                vector2 = EC4_SurfCenter(3,:) - EC4_SurfCenter(4,:);
+                pt2 = EC1_SurfCenter(3,:) - (Clearance.*vector1)/norm(vector1);
+                pt3 = EC4_SurfCenter(4,:) - (Clearance.*vector2)/norm(vector2);        
+                [splinelength,max_curvature, curvature, collisionwith1, collisionwith2] = spline_connection (EC1_SurfCenter(3,:), pt2, pt3, EC4_SurfCenter(4,:),EC1_center, EC4_center, EC1, EC4, cable_radius, radius_of_curvature);
+
+            end
+        end
+
+    end
+    
+    
 end
 
 
