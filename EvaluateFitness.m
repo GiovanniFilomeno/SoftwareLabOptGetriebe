@@ -1,0 +1,147 @@
+function Fitness = EvaluateFitness(pop,bauraum,gearbox,EC1,EC1_center,EC1_SurfCenter,EC2,EC2_center,EC2_SurfCenter,EC3,EC3_center,EC3_SurfCenter,EC4,EC4_center,EC4_SurfCenter,Anchor,EM_start,EM_vector,r,y,theta,Rotations,EC2_placement, Fitness)
+
+
+for i=1:pop
+    
+    %Move the components and associated variables to the position of that chromosome
+    %Gearbox
+    if i == 1
+        gearbox.vertices = Rotation(gearbox.vertices, Anchor, 2, Rotations(i,1));
+        EM_start = Rotation(EM_start, Anchor, 2, Rotations(i,1));
+    else
+        gearbox.vertices = Rotation(gearbox.vertices, Anchor, 2, Rotations(i,1)-Rotations(i-1,1));
+        EM_start = Rotation(EM_start, Anchor, 2, Rotations(i,1)-Rotations(i-1,1));
+        
+    end
+    EM_end = EM_start + EM_vector;
+    
+    coords1(i,:) = [EM_start(1)+ r(i,1).*sin(theta(i,1)) y(i,1) EM_start(3) + r(i,1).*cos(theta(i,1))];
+    coords2(i,:) = [EM_start(1)+ r(i,2).*sin(theta(i,2)) y(i,2) EM_start(3) + r(i,2).*cos(theta(i,2))];
+    coords3(i,:) = [EM_start(1)+ r(i,3).*sin(theta(i,3)) y(i,3) EM_start(3) + r(i,3).*cos(theta(i,3))];
+    coords4(i,:) = [EM_start(1)+ r(i,4).*sin(theta(i,4)) y(i,4) EM_start(3) + r(i,4).*cos(theta(i,4))];
+    
+    %IGBT
+    EC1_mov = zeros(pop,1);
+    if i==1
+        EC1_mov(i) = theta(i,1) + Rotations(i,2);
+    else
+        EC1_mov(i) = theta(i,1) + Rotations(i,2) - theta(i-1,1) - Rotations(i-1,2);
+    end   
+    EC1.vertices = EC1.vertices - EC1_center + coords1(i,:);
+    EC1_SurfCenter(1,:) = EC1_SurfCenter(1,:) - EC1_center + coords1(i,:);
+    EC1_SurfCenter(2,:) = EC1_SurfCenter(2,:) - EC1_center + coords1(i,:);
+    EC1_SurfCenter(3,:) = EC1_SurfCenter(3,:) - EC1_center + coords1(i,:);
+    EC1_SurfCenter(4,:) = EC1_SurfCenter(4,:) - EC1_center + coords1(i,:);
+    EC1_center = coords1(i,:);
+    EC1.vertices = Rotation(EC1.vertices, EC1_center, 2, -EC1_mov(i,1));
+    EC1_SurfCenter(1,:) = Rotation(EC1_SurfCenter(1,:), EC1_center, 2, -EC1_mov(i,1));
+    EC1_SurfCenter(2,:) = Rotation(EC1_SurfCenter(2,:), EC1_center, 2, -EC1_mov(i,1));
+    EC1_SurfCenter(3,:) = Rotation(EC1_SurfCenter(3,:), EC1_center, 2, -EC1_mov(i,1));
+    EC1_SurfCenter(4,:) = Rotation(EC1_SurfCenter(4,:), EC1_center, 2, -EC1_mov(i,1));
+    
+    %Capacitor
+    EC2_mov = zeros(pop,1);
+    if i==1
+        EC2_mov(i) = theta(i,2) + Rotations(i,3);
+    else
+        EC2_mov(i) = theta(i,2) + Rotations(i,3) - theta(i-1,2) - Rotations(i-1,3);
+    end   
+    EC2.vertices = EC2.vertices - EC2_center + coords2(i,:);
+    EC2_SurfCenter(1,:) = EC2_SurfCenter(1,:) - EC2_center + coords2(i,:);
+    EC2_SurfCenter(2,:) = EC2_SurfCenter(2,:) - EC2_center + coords2(i,:);
+    EC2_SurfCenter(3,:) = EC2_SurfCenter(3,:) - EC2_center + coords2(i,:);
+    EC2_SurfCenter(4,:) = EC2_SurfCenter(4,:) - EC2_center + coords2(i,:);
+    EC2_center = coords2(i,:);
+    EC2.vertices = Rotation(EC2.vertices, EC2_center, 2, -EC2_mov(i,1));
+    EC2_SurfCenter(1,:) = Rotation(EC2_SurfCenter(1,:), EC2_center, 2, -EC2_mov(i,1));
+    EC2_SurfCenter(2,:) = Rotation(EC2_SurfCenter(2,:), EC2_center, 2, -EC2_mov(i,1));
+    EC2_SurfCenter(3,:) = Rotation(EC2_SurfCenter(3,:), EC2_center, 2, -EC2_mov(i,1));
+    EC2_SurfCenter(4,:) = Rotation(EC2_SurfCenter(4,:), EC2_center, 2, -EC2_mov(i,1));
+    
+    %EMI-filter
+    EC3_mov = zeros(pop,1);
+    if i==1
+        EC3_mov(i) = theta(i,3) + Rotations(i,4);
+    else
+        EC3_mov(i) = theta(i,3) + Rotations(i,4) - theta(i-1,3) - Rotations(i-1,4);
+    end   
+    EC3.vertices = EC3.vertices - EC3_center + coords3(i,:);
+    EC3_SurfCenter(1,:) = EC3_SurfCenter(1,:) - EC3_center + coords3(i,:);
+    EC3_SurfCenter(2,:) = EC3_SurfCenter(2,:) - EC3_center + coords3(i,:);
+    EC3_SurfCenter(3,:) = EC3_SurfCenter(3,:) - EC3_center + coords3(i,:);
+    EC3_SurfCenter(4,:) = EC3_SurfCenter(4,:) - EC3_center + coords3(i,:);
+    EC3_center = coords3(i,:);
+    EC3.vertices = Rotation(EC3.vertices, EC3_center, 2, -EC3_mov(i,1));
+    EC3_SurfCenter(1,:) = Rotation(EC3_SurfCenter(1,:), EC3_center, 2, -EC3_mov(i,1));
+    EC3_SurfCenter(2,:) = Rotation(EC3_SurfCenter(2,:), EC3_center, 2, -EC3_mov(i,1));
+    EC3_SurfCenter(3,:) = Rotation(EC3_SurfCenter(3,:), EC3_center, 2, -EC3_mov(i,1));
+    EC3_SurfCenter(4,:) = Rotation(EC3_SurfCenter(4,:), EC3_center, 2, -EC3_mov(i,1));
+    
+    %Control board
+    EC4_mov = zeros(pop,1);
+    if i==1
+        EC4_mov(i) = theta(i,4) + Rotations(i,5);
+    else
+        EC4_mov(i) = theta(i,4) + Rotations(i,5) - theta(i-1,4) - Rotations(i-1,5);
+    end   
+    EC4.vertices = EC4.vertices - EC4_center + coords4(i,:);
+    EC4_SurfCenter(1,:) = EC4_SurfCenter(1,:) - EC4_center + coords4(i,:);
+    EC4_SurfCenter(2,:) = EC4_SurfCenter(2,:) - EC4_center + coords4(i,:);
+    EC4_SurfCenter(3,:) = EC4_SurfCenter(3,:) - EC4_center + coords4(i,:);
+    EC4_SurfCenter(4,:) = EC4_SurfCenter(4,:) - EC4_center + coords4(i,:);
+    EC4_center = coords4(i,:);
+    EC4.vertices = Rotation(EC4.vertices, EC4_center, 2, -EC4_mov(i,1));
+    EC4_SurfCenter(1,:) = Rotation(EC4_SurfCenter(1,:), EC4_center, 2, -EC4_mov(i,1));
+    EC4_SurfCenter(2,:) = Rotation(EC4_SurfCenter(2,:), EC4_center, 2, -EC4_mov(i,1));
+    EC4_SurfCenter(3,:) = Rotation(EC4_SurfCenter(3,:), EC4_center, 2, -EC4_mov(i,1));
+    EC4_SurfCenter(4,:) = Rotation(EC4_SurfCenter(4,:), EC4_center, 2, -EC4_mov(i,1));
+    
+%     figure(i)
+%     Visualize(bauraum,gearbox,EC1,EC2,EC3,EC4);
+    %Checking for collisions
+    
+    %Gearbox and bauraum
+    IN = inpolyhedron(bauraum,gearbox.vertices);
+    bauraum_gearbox = sum(IN)/length(IN);
+    
+    %Components inside the bauraum
+    IN = inpolyhedron(bauraum,EC1.vertices);
+    in1_bauraum = sum(IN)/length(IN);
+    IN = inpolyhedron(bauraum,EC2.vertices);
+    in2_bauraum = sum(IN)/length(IN);
+    IN = inpolyhedron(bauraum,EC3.vertices);
+    in3_bauraum = sum(IN)/length(IN);
+    IN = inpolyhedron(bauraum,EC4.vertices);
+    in4_bauraum = sum(IN)/length(IN);
+    
+    %Components outside the gearbox/EM
+    IN = inpolyhedron(gearbox,EC1.vertices);
+    out1_gearbox = sum(IN)/length(IN);
+    IN = inpolyhedron(gearbox,EC2.vertices);
+    out2_gearbox = sum(IN)/length(IN);
+    IN = inpolyhedron(gearbox,EC3.vertices);
+    out3_gearbox = sum(IN)/length(IN);
+    IN = inpolyhedron(gearbox,EC4.vertices);
+    out4_gearbox = sum(IN)/length(IN);
+    
+    
+    %Components with themselves
+    IN = inpolyhedron(EC1,EC2.vertices);
+    collision12 = sum(IN)/length(IN);
+    IN = inpolyhedron(EC1,EC3.vertices);
+    collision13 = sum(IN)/length(IN);
+    IN = inpolyhedron(EC1,EC4.vertices);
+    collision14 = sum(IN)/length(IN);
+    IN = inpolyhedron(EC2,EC3.vertices);
+    collision23 = sum(IN)/length(IN);
+    IN = inpolyhedron(EC2,EC4.vertices);
+    collision24 = sum(IN)/length(IN);
+    IN = inpolyhedron(EC3,EC4.vertices);
+    collision34 = sum(IN)/length(IN);
+        
+    Fitness(i,1) = OptimizationFunction(bauraum_gearbox, EC1_center, EC1_SurfCenter, EC2_SurfCenter, EC3_SurfCenter, EC4_SurfCenter, EM_start, EM_end, in1_bauraum, in2_bauraum, in3_bauraum, in4_bauraum, out1_gearbox,  out2_gearbox, out3_gearbox, out4_gearbox, collision12, collision13, collision14, collision23, collision24, collision34, EC2_placement(i,1)); 
+
+end
+
+
+end
