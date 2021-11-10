@@ -1,4 +1,4 @@
-function [length,max_curvature, curvature, collisionwith1, collisionwith2] = spline_connection (pt1, pt2, pt3, pt4,EC1_center, EC2_center, EC1, EC2, bauraum, cable_radius, radius_of_curvature)
+function [length,max_curvature, curvature, collisionwith1, collisionwith2, Penalty_spline, fn] = spline_connection (pt1, pt2, pt3, pt4,EC1_center, EC2_center, EC1, EC2, bauraum, cable_radius, radius_of_curvature)
 
 collisionwith1 = 1;
 collisionwith2 = 1;
@@ -10,23 +10,23 @@ pt2b = pt2 + 0.5 .* vector ;
 pt2c = pt2 + 0.75 .* vector ;
 
 xyz = [pt1; pt2; pt2a; pt2b; pt2c; pt3; pt4];
-patch(EC1,'FaceColor',       [0.8 0 0], ...
-    'EdgeColor',       'green',        ...
-    'FaceLighting',    'gouraud',     ...
-    'AmbientStrength', 0.15);
-
-patch(EC2,'FaceColor',       [0 0.8 0], ...
-    'EdgeColor',       'red',        ...
-    'FaceLighting',    'gouraud',     ...
-    'AmbientStrength', 0.15);
-hold on
-view([45 90 135]);
-xlabel('X') 
-ylabel('Y')
-zlabel('Z')
+% patch(EC1,'FaceColor',       [0.8 0 0], ...
+%     'EdgeColor',       'green',        ...
+%     'FaceLighting',    'gouraud',     ...
+%     'AmbientStrength', 0.15);
+% 
+% patch(EC2,'FaceColor',       [0 0.8 0], ...
+%     'EdgeColor',       'red',        ...
+%     'FaceLighting',    'gouraud',     ...
+%     'AmbientStrength', 0.15);
+% hold on
+% view([45 90 135]);
+% xlabel('X') 
+% ylabel('Y')
+% zlabel('Z')
 %axis([0 10 0 10 0 10])
-camlight('headlight');
-material('default');
+% camlight('headlight');
+% material('default');
 % scatter3(pt1(1),pt1(2),pt1(3),'o','y');
 % scatter3(pt4(1),pt4(2),pt4(3),'o','y');
 
@@ -37,13 +37,13 @@ ax.XTick = [];
 ax.YTick = [];
 ax.ZTick = [];
 % xyz = [x ;y ;z];
-hold on  
+% hold on  
 
 iteration = 0;
 max_curvature = 0.5;
-while (collisionwith1>0 || collisionwith2>0 || collisionwithbauraum<1 || max_curvature<(1/radius_of_curvature) || iteration < 10)
+while (collisionwith1>0 || collisionwith2>0 || collisionwithbauraum<1 || max_curvature<(1/radius_of_curvature) || iteration < 30)
 %xyz = [pt1; pt2; pt3; pt4];
-iteration = iteration+1
+iteration = iteration+1;
 
 vector1 = pt2a-EC1_center;
  vector1 = vector1 / norm(vector1);
@@ -155,17 +155,22 @@ max_curvature = max(curvature);
 max_curvature_index = find(curvature == max_curvature);
 %max_curvature_positions
 
-collisionwith1 = sum(collision1)/size(collision1,2)
-collisionwith2 = sum(collision2)/size(collision2,2)
-collisionwithbauraum = sum(collisionbauraum)/size(collisionbauraum,2)
+collisionwith1 = sum(collision1)/size(collision1,2);
+collisionwith2 = sum(collision2)/size(collision2,2);
+collisionwithbauraum = sum(collisionbauraum)/size(collisionbauraum,2);
 
-    if (collisionwith1<0.01 && collisionwith2<0.01 && collisionwithbauraum>0.99 && max_curvature>(1/radius_of_curvature)) || iteration == 10
+    if (collisionwith1<0.01 && collisionwith2<0.01 && collisionwithbauraum>0.99 && max_curvature>(1/radius_of_curvature) || iteration == 30)
+        Penalty_spline = 0;
+        if iteration == 10
+            Penalty_spline = 1000;
+        end
         pt2a = pt2a + cable_radius*vector1 ;
         pt2b = pt2b + cable_radius*vector3  ;
         pt2c = pt2c + cable_radius*vector2 ;
 
         xyz = [pt1; pt2; pt2a; pt2b; pt2c; pt3; pt4];
         fn = cscvn(xyz');
+        
         break;
     end
 
@@ -191,8 +196,8 @@ xyz = [pt1; pt2; pt2a; pt2b; pt2c; pt3; pt4];
 % material('default');
 % scatter3(pt1(1),pt1(2),pt1(3),'o','red');
 % scatter3(pt4(1),pt4(2),pt4(3),'o','red');
-fnplt(fn,'r',2);
-plot3(xyz(:,1),xyz(:,2),xyz(:,3),'ro','LineWidth',2);
+% fnplt(fn,'r',2);
+%plot3(xyz(:,1),xyz(:,2),xyz(:,3),'ro','LineWidth',2);
 % text(xyz,[repmat('  ',4,1), num2str((1:4)')])
 ax = gca;
 ax.XTick = [];
