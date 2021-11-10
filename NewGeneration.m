@@ -1,7 +1,10 @@
-function [r,y,theta,rotations,EC2_placement, Fitness] = NewGeneration(pop,iter,r,y,theta,rotations,EC2_placement, Fitness)
+function [r,y,theta,rotations,EC2_placement, Fitness, Best_fitness, Mean_fitness, Worst_fitness] = NewGeneration(pop,iter,r,y,theta,rotations,EC2_placement, Fitness)
 %Sort chromosomes based on their Fitness values
 [srt,I]=sort(Fitness);
 fprintf('Fitness of Generation %d: %d \n',iter-1,srt(1,1));
+Best_fitness = srt(1,1);
+Mean_fitness = mean(Fitness);
+Worst_fitness = srt(pop,1);
 theta(I(1,1),:);
 %Select the best half of chromosomes from this generation
 best_r = zeros(pop,4);
@@ -173,34 +176,11 @@ for k = 1:2:pop/2
     best_rotations(k+1,5) = child_rot(2,5);
 
 end
-
-%Write other half of new population from the best of previous generation     
-% for i=(pop/2+1):pop
-%     r(i,1) = best_r(i-(pop/2),1);
-%     r(i,2) = best_r(i-(pop/2),2);
-%     r(i,3) = best_r(i-(pop/2),3);
-%     r(i,4) = best_r(i-(pop/2),4);
-%     y(i,1) = best_y(i-(pop/2),1);
-%     y(i,2) = best_y(i-(pop/2),2);
-%     y(i,3) = best_y(i-(pop/2),3);
-%     y(i,4) = best_y(i-(pop/2),4);
-%     theta(i,1) = best_theta(i-(pop/2),1);
-%     theta(i,1) = best_theta(i-(pop/2),2);
-%     theta(i,1) = best_theta(i-(pop/2),3);
-%     theta(i,1) = best_theta(i-(pop/2),4);
-%     EC2_placement(i,1) = best_placement(i-(pop/2),1); 
-%     rotations(i,1) = best_rotations(i-(pop/2),1);
-%     rotations(i,2) = best_rotations(i-(pop/2),2);
-%     rotations(i,3) = best_rotations(i-(pop/2),3);
-%     rotations(i,4) = best_rotations(i-(pop/2),4);
-%     rotations(i,5) = best_rotations(i-(pop/2),5);
-%     Fitness(i,1) = best_Fitness(i-(pop/2),1);
-% end
 r = best_r;
 y = best_y;
 theta = best_theta;
 rotations = best_rotations;
 EC2_placement = best_placement;
 Fitness = best_Fitness;
-    
+
 end
