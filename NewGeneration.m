@@ -3,7 +3,7 @@ function [r,y,theta,rotations,EC2_placement, Fitness, Best_fitness, Mean_fitness
 [srt,I]=sort(Fitness);
 for i=1:pop-1
     j = i+1;
-    ratio = srt(j,1)/srt(i,1)
+    ratio = srt(j,1)/srt(i,1);
     if ratio > 1.75
         break
     end
