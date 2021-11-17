@@ -1,11 +1,18 @@
 function [r,y,theta,rotations,EC2_placement, Fitness, Best_fitness, Mean_fitness, Worst_fitness] = NewGeneration(pop,iter,r,y,theta,rotations,EC2_placement, Fitness)
 %Sort chromosomes based on their Fitness values
 [srt,I]=sort(Fitness);
+for i=1:pop-1
+    j = i+1;
+    ratio = srt(j,1)/srt(i,1)
+    if ratio > 1.75
+        break
+    end
+end
 fprintf('Fitness of Generation %d: %d \n',iter-1,srt(1,1));
 Best_fitness = srt(1,1);
 Mean_fitness = mean(Fitness);
-Worst_fitness = srt(pop,1);
-theta(I(1,1),:);
+thetaWorst_fitness = srt(pop,1);
+(I(1,1),:);
 %Select the best half of chromosomes from this generation
 best_r = zeros(pop,4);
 best_y = zeros(pop,4);
@@ -102,6 +109,19 @@ for k = 1:2:pop/2
 
     %       Mutation
     for i = 1:2
+        mut_prob = rand();
+        if (mut_prob>=0.75)
+            child1(i,1) = child1(i,1) + 10*rand();
+            child2(i,1) = child2(i,1) + 10*rand();
+            child3(i,1) = child3(i,1) + 10*rand();
+            child4(i,1) = child4(i,1) + 10*rand();
+        elseif (mut_prob>=0.5) && (mut_prob<0.75)
+            child1(i,1) = child1(i,1) - 10*rand();
+            child2(i,1) = child2(i,1) - 10*rand();
+            child3(i,1) = child3(i,1) - 10*rand();
+            child4(i,1) = child4(i,1) - 10*rand();
+        end
+        
         mut_prob = rand();
         if (mut_prob>=0.75)
             child1(i,2) = child1(i,2) + 100*rand();
