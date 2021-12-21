@@ -1,0 +1,733 @@
+<!doctype html>
+<html class="no-js">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Visualization" href="Visualization.html" /><link rel="prev" title="Geometry" href="Geometry.html" />
+
+    <meta name="generator" content="sphinx-4.3.1, furo 2021.11.23"/>
+        <title>Optimization - Software Lab 2021 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=7f0192ddeb2adecfbaa87ffbcf67d16358b30bc1" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=0af69da206d614734f649b27d4cdc2dd6c31f41d" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  body[data-theme="dark"] {
+    --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+  }
+  @media (prefers-color-scheme: dark) {
+    body:not([data-theme="light"]) {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+  }
+</style></head>
+  <body>
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" />
+      <line x1="4" y1="6" x2="20" y2="6" />
+      <line x1="10" y1="12" x2="20" y2="12" />
+      <line x1="6" y1="18" x2="20" y2="18" />
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">Software Lab 2021 1.0 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  
+  <span class="sidebar-brand-text">Software Lab 2021 1.0 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Main.html">Main Script</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Geometry.html">Geometry</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Visualization.html">Visualization</a></li>
+</ul>
+
+</div>
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <section id="module-Optimization">
+<span id="optimization"></span><h1>Optimization<a class="headerlink" href="#module-Optimization" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="#Optimization.EvaluateFitness" title="Optimization.EvaluateFitness"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">EvaluateFitness()</span></code></a></p></li>
+<li><p><a class="reference internal" href="#Optimization.InitialPopulation" title="Optimization.InitialPopulation"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">InitialPopulation()</span></code></a></p></li>
+<li><p><a class="reference internal" href="#Optimization.inpolyhedron" title="Optimization.inpolyhedron"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">inpolyhedron()</span></code></a></p></li>
+<li><p><a class="reference internal" href="#Optimization.NewGeneration" title="Optimization.NewGeneration"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">NewGeneration()</span></code></a></p></li>
+<li><p><a class="reference internal" href="#Optimization.OptimizationFunction" title="Optimization.OptimizationFunction"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">OptimizationFunction()</span></code></a></p></li>
+<li><p><a class="reference internal" href="#Optimization.point_to_line" title="Optimization.point_to_line"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">point_to_line()</span></code></a></p></li>
+<li><p><a class="reference internal" href="#Optimization.spline_connection" title="Optimization.spline_connection"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">spline_connection()</span></code></a></p></li>
+<li><p><a class="reference internal" href="#Optimization.spline_connection_gb" title="Optimization.spline_connection_gb"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">spline_connection_gb()</span></code></a></p></li>
+</ul>
+<section id="evaluate-fitness">
+<h2>Evaluate Fitness<a class="headerlink" href="#evaluate-fitness" title="Permalink to this headline">¶</a></h2>
+<dl class="mat function">
+<dt class="sig sig-object mat" id="Optimization.EvaluateFitness">
+<span class="sig-prename descclassname"><span class="pre">Optimization.</span></span><span class="sig-name descname"><span class="pre">EvaluateFitness</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">Mean_fitness</span></em>, <em class="sig-param"><span class="pre">pop</span></em>, <em class="sig-param"><span class="pre">bauraum</span></em>, <em class="sig-param"><span class="pre">gearbox</span></em>, <em class="sig-param"><span class="pre">EC1</span></em>, <em class="sig-param"><span class="pre">EC1_width</span></em>, <em class="sig-param"><span class="pre">EC1_center</span></em>, <em class="sig-param"><span class="pre">EC1_SurfCenter</span></em>, <em class="sig-param"><span class="pre">EC2</span></em>, <em class="sig-param"><span class="pre">EC2_center</span></em>, <em class="sig-param"><span class="pre">EC2_SurfCenter</span></em>, <em class="sig-param"><span class="pre">EC3</span></em>, <em class="sig-param"><span class="pre">EC3_center</span></em>, <em class="sig-param"><span class="pre">EC3_SurfCenter</span></em>, <em class="sig-param"><span class="pre">EC4</span></em>, <em class="sig-param"><span class="pre">EC4_center</span></em>, <em class="sig-param"><span class="pre">EC4_SurfCenter</span></em>, <em class="sig-param"><span class="pre">Anchor</span></em>, <em class="sig-param"><span class="pre">EM_start</span></em>, <em class="sig-param"><span class="pre">EM_vector</span></em>, <em class="sig-param"><span class="pre">r</span></em>, <em class="sig-param"><span class="pre">y</span></em>, <em class="sig-param"><span class="pre">theta</span></em>, <em class="sig-param"><span class="pre">Rotations</span></em>, <em class="sig-param"><span class="pre">EC2_placement</span></em>, <em class="sig-param"><span class="pre">Fitness</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Optimization.EvaluateFitness" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function that reads the possible rotation of the gearbox, as well as the
+dimensions of the Electric motor and Electric components and then creates
+random sets of values of coordinates and angles between these limits. The
+number of sets created is given by the size of population <strong>pop</strong>. The
+generation of each Electric Component coordinates and angles is connected
+to the values of the other neighboring geometries, as this code application
+assumes the best solution as the one where the ECs are wrapped around the
+Electric motor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Mean_fitness</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">double</span></code></span>) – Average of the fitness of all the individuals
+in the population. Used to decide which
+individuals will be considered good enough to generate
+splines on them. For the first generation
+gets a value of 20000 based on performance of
+the first generations in many trials.</p></li>
+<li><p><strong>pop</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">int</span></code></span>) – Size of the population.</p></li>
+<li><p><strong>bauraum</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">struct</span></code></span>) – struct that represents the Bauraum geometry.</p></li>
+<li><p><strong>gearbox</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">struct</span></code></span>) – struct that represents the Gearbox geometry.</p></li>
+<li><p><strong>EC1</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">struct</span></code></span>) – struct that represents the IGBT geometry.</p></li>
+<li><p><strong>EC1_width</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">double</span></code></span>) – Width of the IGBT. Used for spline creation.</p></li>
+<li><p><strong>EC1_center</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Vector of coordinates of the body center of the
+IGBT.</p></li>
+<li><p><strong>EC1_SurfCenter</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Vector of coordinates of the centers of the faces of the
+IGBT.</p></li>
+<li><p><strong>EC2</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">struct</span></code></span>) – struct that represents the Capacitor geometry.</p></li>
+<li><p><strong>EC2_center</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Vector of coordinates of the body center of the
+Capacitor.</p></li>
+<li><p><strong>EC2_SurfCenter</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Vector of coordinates of the centers of the faces of the
+Capacitor.</p></li>
+<li><p><strong>EC3</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">struct</span></code></span>) – struct that represents the EMI-filter geometry.</p></li>
+<li><p><strong>EC3_center</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Vector of coordinates of the body center of the
+EMI-filter.</p></li>
+<li><p><strong>EC3_SurfCenter</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Vector of coordinates of the centers of the faces of the
+EMI-filter.</p></li>
+<li><p><strong>EC4</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">struct</span></code></span>) – struct that represents the Control Board geometry.</p></li>
+<li><p><strong>EC4_center</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Vector of coordinates of the body center of the
+Control board.</p></li>
+<li><p><strong>EC4_SurfCenter</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Vector of coordinates of the centers of the faces of the
+Control board.</p></li>
+<li><p><strong>Anchor</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Coordinates of a point at the center of the gearbox
+shaft, which will be used for rotations.</p></li>
+<li><p><strong>EM_start</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Coordinates of the center of the electric motor.</p></li>
+<li><p><strong>EM_vector</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Vector pointing the direction of the gearbox.</p></li>
+<li><p><strong>r</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Array of coordinates for the distance between each
+individual and the center of the electric motor.</p></li>
+<li><p><strong>y</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Array of coordinates for the Y-position of each
+individual.</p></li>
+<li><p><strong>theta</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Array of angles of the position of each individual’s ECs
+with respect of the Electric Motor</p></li>
+<li><p><strong>Rotations</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Array of angles that define the orientation of
+each individual’s ECs.</p></li>
+<li><p><strong>EC2_placement</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Array of logical values that define the position of each individual’s 
+Capacitor with respect of IGBT of said individual.</p></li>
+<li><p><strong>Fitness</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Current Fitness array, filled with zeros at the
+beginning or the fitness of the previous generation. To be overwritten
+with the values obtained from this function call.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>Fitness</strong> : popx1 array with the fitness value of each individual in
+the population. Initially filled with zeros, as this function is called each generation to evaluate the
+new individuals this array is overwritten every generation with the
+fitness values of the new individuals. Fitness calculation is obtained
+here with inner <a class="reference internal" href="#Optimization.OptimizationFunction" title="Optimization.OptimizationFunction"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">OptimizationFunction()</span></code></a> and the subsequent
+computation of the splines via <a class="reference internal" href="#Optimization.spline_connection" title="Optimization.spline_connection"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">spline_connection()</span></code></a> and <a class="reference internal" href="#Optimization.spline_connection_gb" title="Optimization.spline_connection_gb"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">spline_connection_gb()</span></code></a></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>double array</p>
+</dd>
+</dl>
+<p><strong>Example in Code</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Fitness</span> <span class="o">=</span> <span class="n">EvaluateFitness</span><span class="p">(</span><span class="n">Mean_fitness</span><span class="p">,</span> <span class="nb">iter</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span><span class="n">pop</span><span class="p">,</span><span class="n">bauraum</span><span class="p">,</span><span class="n">gearbox</span><span class="p">,</span><span class="n">EC1</span><span class="p">,</span><span class="n">EC1_width</span><span class="p">,</span> <span class="n">EC1_center</span><span class="p">,</span><span class="n">EC1_SurfCenter</span><span class="p">,</span><span class="n">EC2</span><span class="p">,</span><span class="n">EC2_center</span><span class="p">,</span><span class="n">EC2_SurfCenter</span><span class="p">,</span><span class="n">EC3</span><span class="p">,</span><span class="n">EC3_center</span><span class="p">,</span><span class="n">EC3_SurfCenter</span><span class="p">,</span><span class="n">EC4</span><span class="p">,</span><span class="n">EC4_center</span><span class="p">,</span><span class="n">EC4_SurfCenter</span><span class="p">,</span><span class="n">Anchor</span><span class="p">,</span><span class="n">EM_start</span><span class="p">,</span><span class="n">EM_vector</span><span class="p">,</span><span class="n">r</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">theta</span><span class="p">,</span><span class="n">Rotations</span><span class="p">,</span><span class="n">EC2_placement</span><span class="p">,</span> <span class="n">Fitness</span><span class="p">);</span>
+</pre></div>
+</div>
+</dd></dl>
+</section>
+<section id="initial-population">
+<h2>Initial Population<a class="headerlink" href="#initial-population" title="Permalink to this headline">¶</a></h2>
+<dl class="mat function">
+<dt class="sig sig-object mat" id="Optimization.InitialPopulation">
+<span class="sig-prename descclassname"><span class="pre">Optimization.</span></span><span class="sig-name descname"><span class="pre">InitialPopulation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">rad_range</span></em>, <em class="sig-param"><span class="pre">pop</span></em>, <em class="sig-param"><span class="pre">EM_start</span></em>, <em class="sig-param"><span class="pre">EM_vector</span></em>, <em class="sig-param"><span class="pre">EM_radius</span></em>, <em class="sig-param"><span class="pre">EC1_height</span></em>, <em class="sig-param"><span class="pre">EC1_width</span></em>, <em class="sig-param"><span class="pre">EC2_height</span></em>, <em class="sig-param"><span class="pre">EC2_width</span></em>, <em class="sig-param"><span class="pre">EC3_height</span></em>, <em class="sig-param"><span class="pre">EC3_width</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Optimization.InitialPopulation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function that reads the possible rotation of the gearbox, as well as the
+dimensions of the Electric motor and Electric components and then creates
+random sets of values of coordinates and angles between these limits. The
+number of sets created is given by the size of population <strong>pop</strong>. The
+generation of each Electric Component coordinates and angles is connected
+to the values of the other neighboring geometries, as this code application
+assumes the best solution as the one where the ECs are wrapped around the
+Electric motor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rad_range</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">double</span></code></span>) – Range of rotation of the gearbox without going
+out of the bauraum. Obtained from <code class="xref mat mat-func docutils literal notranslate"><span class="pre">PositionGearbox()</span></code>.</p></li>
+<li><p><strong>pop</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">int</span></code></span>) – Size of the population for the genetic algorithm. User
+defined value.</p></li>
+<li><p><strong>EM_start</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Vector of the Electric motor center coordinates.</p></li>
+<li><p><strong>EM_vector</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Vector of Gearbox and Electric motor direction.</p></li>
+<li><p><strong>EM_radius</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Radius of the electric motor.</p></li>
+<li><p><strong>EC1_height</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">double</span></code></span>) – Height of the IGBT.</p></li>
+<li><p><strong>EC1_width</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">double</span></code></span>) – Width of the IGBT.</p></li>
+<li><p><strong>EC2_height</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">double</span></code></span>) – Height of the Capacitor.</p></li>
+<li><p><strong>EC2_width</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">double</span></code></span>) – Width of the Capacitor</p></li>
+<li><p><strong>EC3_height</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">double</span></code></span>) – Height of the EMI-filter</p></li>
+<li><p><strong>EC3_width</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">double</span></code></span>) – Width of the EMI- filter</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt><em>[r, y, theta, rotations, EC2_placement]</em></dt><dd><ul class="simple">
+<li><p><strong>r</strong> : popx4(1 column per EC) array with random values that define the perpendicular distance
+between the center of the electric motor and the respective ECs.</p></li>
+<li><p><strong>y</strong> : popx4 array with random values that define the y-axis
+location of the ECs. These random values are limited between the
+minimum and maximum Y coordinate of the Electric motor.</p></li>
+<li><p><strong>theta</strong> : popx4 array with random values between 0 and 2*pi that
+define the position of the ECs around the circular Electric Motor.</p></li>
+<li><p><strong>rotations</strong> : popx5(4 ECs and gearbox) array with random values
+that define the rotations of the gearbox along its drive axis, as
+well as the rotation of the ECs along its own center.</p></li>
+<li><p><strong>EC2_placement</strong> : popx1 array with random boolean values.
+Whether the value is 1 or 0 defines if the Capacitor will be
+positioned to the left or right of the IGBT.</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>[ double array, double array, double array, double array, double array]</p>
+</dd>
+</dl>
+<p><strong>Example in Code</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">r</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">rotations</span><span class="p">,</span> <span class="n">EC2_placement</span> <span class="p">]</span><span class="o">=</span><span class="n">InitialPopulation</span><span class="p">(</span><span class="n">rad_range</span><span class="p">,</span><span class="n">pop</span><span class="p">,</span><span class="n">EM_start</span><span class="p">,</span><span class="n">EM_vector</span><span class="p">,</span><span class="n">EM_radius</span><span class="p">,</span><span class="n">EC1_height</span><span class="p">,</span><span class="n">EC1_width</span><span class="p">,</span><span class="n">EC2_height</span><span class="p">,</span><span class="n">EC2_width</span><span class="p">,</span><span class="n">EC3_height</span><span class="p">,</span><span class="n">EC3_width</span><span class="p">);</span>
+</pre></div>
+</div>
+</dd></dl>
+</section>
+<section id="inpolyhedron">
+<h2>INPOLYHEDRON<a class="headerlink" href="#inpolyhedron" title="Permalink to this headline">¶</a></h2>
+<dl class="mat function">
+<dt class="sig sig-object mat" id="Optimization.inpolyhedron">
+<span class="sig-prename descclassname"><span class="pre">Optimization.</span></span><span class="sig-name descname"><span class="pre">inpolyhedron</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">varargin</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Optimization.inpolyhedron" title="Permalink to this definition">¶</a></dt>
+<dd><p>INPOLYHEDRON  Tests if points are inside a 3D triangulated (faces/vertices) surface</p>
+<p>IN = INPOLYHEDRON(FV,QPTS) tests if the query points (QPTS) are inside
+the patch/surface/polyhedron defined by FV (a structure with fields
+‘vertices’ and ‘faces’). QPTS is an N-by-3 set of XYZ coordinates. IN
+is an N-by-1 logical vector which will be TRUE for each query point
+inside the surface. By convention, surface normals point OUT from the
+object (see FLIPNORMALS option below if to reverse this convention).</p>
+<p><strong>For this application, the function gives an array the size of the
+vertices of one of the bodies. The cells in these array give a value of
+1 if the vertice is inside the other geometry and 0 if contrary. To
+calculate how much two bodies are colliding we sum the elements in the
+array and divide by the number of vertices, which gives the percentage
+of collision between two bodies, as can be seen in the code example
+below.</strong></p>
+<p><strong>Example in Code</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">IN</span> <span class="o">=</span> <span class="n">inpolyhedron</span><span class="p">(</span><span class="n">bauraum</span><span class="p">,</span><span class="n">EC1</span><span class="o">.</span><span class="n">vertices</span><span class="p">);</span>
+<span class="n">in1_bauraum</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">IN</span><span class="p">)</span><span class="o">/</span><span class="n">length</span><span class="p">(</span><span class="n">IN</span><span class="p">);</span>
+</pre></div>
+</div>
+<p><strong>Special thanks to:</strong></p>
+<p>Author: Sven Holcombe</p>
+<ul class="simple">
+<li><p>10 Jun 2012: Version 1.0</p></li>
+<li><p>28 Aug 2012: Version 1.1 - Speedup using accumarray.</p></li>
+<li><p>07 Nov 2012: Version 2.0 - BEHAVIOUR CHANGE Query points coincident with a VERTEX are now IN an XY triangle</p></li>
+<li><p>18 Aug 2013: Version 2.1 - Gridded query point handling with low memory footprint.</p></li>
+<li><p>10 Sep 2013: Version 3.0 - BEHAVIOUR CHANGE NEW CONVENTION ADOPTED to expect face normals pointing IN Vertically oriented faces are now ignored. Speeds up computation and fixes bug where presence of vertical faces produced NaN distance from a query pt to facet, making all query points under facet erroneously NOT IN polyhedron.</p></li>
+<li><p>25 Sep 2013: Version 3.1 - Dropped nested unique call which was made mostly redundant via v2.1 gridded point handling. Also refreshed grid size selection via optimisation.</p></li>
+<li><p>25 Feb 2014: Version 3.2 - Fixed indeterminate behaviour for query points <em>exactly</em> in line with an “overhanging” vertex.</p></li>
+<li><p>11 Nov 2016: Version 3.3 - Used quoted semicolons ‘:’ inside function handle calls to conform with new 2015b interpreter.</p></li>
+</ul>
+</dd></dl>
+</section>
+<section id="new-generation">
+<h2>New Generation<a class="headerlink" href="#new-generation" title="Permalink to this headline">¶</a></h2>
+<dl class="mat function">
+<dt class="sig sig-object mat" id="Optimization.NewGeneration">
+<span class="sig-prename descclassname"><span class="pre">Optimization.</span></span><span class="sig-name descname"><span class="pre">NewGeneration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">pop</span></em>, <em class="sig-param"><span class="pre">iter</span></em>, <em class="sig-param"><span class="pre">r</span></em>, <em class="sig-param"><span class="pre">y</span></em>, <em class="sig-param"><span class="pre">theta</span></em>, <em class="sig-param"><span class="pre">rotations</span></em>, <em class="sig-param"><span class="pre">EC2_placement</span></em>, <em class="sig-param"><span class="pre">Fitness</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Optimization.NewGeneration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function that takes the current set of individuals along with their
+recently computed Fitness value and proceeds to apply the
+population-based optimization algorithm, where based on their fitness
+two individuals are chosen(<strong>SELECTION</strong>), their set of variables combined(<strong>CROSSOVER</strong>)
+and the resulting offspring is altered a little(<strong>MUTATION</strong>) in order to
+obtain a new set of individuals carrying the information of the best
+elements of the previous generation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pop</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">int</span></code></span>) – Size of the population for the genetic algorithm. User
+defined value.</p></li>
+<li><p><strong>iter</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">int</span></code></span>) – Current iteration of the algorithm.</p></li>
+<li><p><strong>r</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Array with current generation values that define the perpendicular distance
+between the center of the electric motor and the respective ECs</p></li>
+<li><p><strong>y</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Array with current generation values that define the y-axis
+location of the ECs.</p></li>
+<li><p><strong>theta</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Array with current generation values between 0 and 2*pi that
+define the position of the ECs around the circular Electric Motor.</p></li>
+<li><p><strong>Rotations</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Array with current generation values that define the rotations 
+of the gearbox along its drive axis, as
+well as the rotation of the ECs along its own center.</p></li>
+<li><p><strong>EC2_placement</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Array with current generation boolean values. Whether the value 
+is 1 or 0 defines if the Capacitor will be
+positioned to the left or right of the IGBT.</p></li>
+<li><p><strong>Fitness</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Fitness of the current Generation. Used here to
+compute mean, worst and best fitness so the selection can be done.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt><em>[r, y, theta, rotations, EC2_placement, Fitness, Best_fitness, Mean_fitness, Worst_fitness]</em></dt><dd><ul class="simple">
+<li><p><strong>r</strong> : Updated array with new generation values that define the perpendicular distance
+between the center of the electric motor and the respective ECs.</p></li>
+<li><p><strong>y</strong> : Updated array with new generation values that define the y-axis
+location of the ECs. Mutation can make some go beyond initial limits.</p></li>
+<li><p><strong>theta</strong> : Updated array with new generation values between 0 and 2*pi that
+define the position of the ECs around the circular Electric Motor.</p></li>
+<li><p><strong>rotations</strong> :Updated array with new generation values
+that define the rotations of the gearbox along its drive axis, as
+well as the rotation of the ECs along their own center.</p></li>
+<li><p><strong>EC2_placement</strong> : Updated array with new generation boolean values.
+Whether the value is 1 or 0 defines if the Capacitor will be
+positioned to the left or right of the IGBT.</p></li>
+<li><p><strong>Fitness</strong> : Updated fitness of the new Generation. Because best half of previous generation is preserved and the other half
+is new, preserved individuals keep their fitness. This helps in
+that for next <a class="reference internal" href="#Optimization.EvaluateFitness" title="Optimization.EvaluateFitness"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">EvaluateFitness()</span></code></a> calls, only half of new
+generation is evaluated so computing time is reduced.</p></li>
+<li><p><strong>Best_fitness</strong> : Lowest value from Fitness array of the
+previous generation. Used to measure the performance of the
+algorithm</p></li>
+<li><p><strong>Mean_fitness</strong> : Average value from Fitness array of the
+previous generation. Used to measure the performance of the
+algorithm and for further <a class="reference internal" href="#Optimization.EvaluateFitness" title="Optimization.EvaluateFitness"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">EvaluateFitness()</span></code></a> to determine if
+an individual can generate a spline.</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>[ double array, double array, double array, double array, double array, double array, double, double, double]</p>
+</dd>
+</dl>
+<p><strong>Example in Code</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">r</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">theta</span><span class="p">,</span><span class="n">rotations</span><span class="p">,</span><span class="n">EC2_placement</span><span class="p">,</span> <span class="n">Fitness</span><span class="p">,</span> <span class="n">Best_fitness</span><span class="p">,</span> <span class="n">Mean_fitness</span><span class="p">]</span> <span class="o">=</span> <span class="n">NewGeneration</span><span class="p">(</span><span class="n">pop</span><span class="p">,</span><span class="n">g</span><span class="p">,</span><span class="n">r</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">theta</span><span class="p">,</span><span class="n">rotations</span><span class="p">,</span><span class="n">EC2_placement</span><span class="p">,</span> <span class="n">Fitness</span><span class="p">);</span>
+</pre></div>
+</div>
+</dd></dl>
+</section>
+<section id="optimization-function">
+<h2>Optimization Function<a class="headerlink" href="#optimization-function" title="Permalink to this headline">¶</a></h2>
+<dl class="mat function">
+<dt class="sig sig-object mat" id="Optimization.OptimizationFunction">
+<span class="sig-prename descclassname"><span class="pre">Optimization.</span></span><span class="sig-name descname"><span class="pre">OptimizationFunction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">bauraum_gearbox</span></em>, <em class="sig-param"><span class="pre">EC1_center</span></em>, <em class="sig-param"><span class="pre">EC1_SurfCenter</span></em>, <em class="sig-param"><span class="pre">EC2_SurfCenter</span></em>, <em class="sig-param"><span class="pre">EC3_SurfCenter</span></em>, <em class="sig-param"><span class="pre">EC4_SurfCenter</span></em>, <em class="sig-param"><span class="pre">EM_start</span></em>, <em class="sig-param"><span class="pre">EM_end</span></em>, <em class="sig-param"><span class="pre">in1_bauraum</span></em>, <em class="sig-param"><span class="pre">in2_bauraum</span></em>, <em class="sig-param"><span class="pre">in3_bauraum</span></em>, <em class="sig-param"><span class="pre">in4_bauraum</span></em>, <em class="sig-param"><span class="pre">out1_gearbox</span></em>, <em class="sig-param"><span class="pre">out2_gearbox</span></em>, <em class="sig-param"><span class="pre">out3_gearbox</span></em>, <em class="sig-param"><span class="pre">out4_gearbox</span></em>, <em class="sig-param"><span class="pre">collision12</span></em>, <em class="sig-param"><span class="pre">collision13</span></em>, <em class="sig-param"><span class="pre">collision14</span></em>, <em class="sig-param"><span class="pre">collision23</span></em>, <em class="sig-param"><span class="pre">collision24</span></em>, <em class="sig-param"><span class="pre">collision34</span></em>, <em class="sig-param"><span class="pre">EC2_placement</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Optimization.OptimizationFunction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function that calculates the distance between IGBT and Electric Motor,
+as well as the distance between components that are connected using <a class="reference internal" href="#Optimization.point_to_line" title="Optimization.point_to_line"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">point_to_line()</span></code></a>. 
+Then uses the collisions calculated with <a class="reference internal" href="#Optimization.inpolyhedron" title="Optimization.inpolyhedron"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">inpolyhedron()</span></code></a> for the current individual
+being evaluated in <a class="reference internal" href="#Optimization.EvaluateFitness" title="Optimization.EvaluateFitness"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">EvaluateFitness()</span></code></a> to apply penalties in case of
+collisions and obtain the fitness value for said individual</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bauraum_gearbox</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">double</span></code></span>) – Interference between gearbox and bauraum.</p></li>
+<li><p><strong>EC1_center</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Vector of coordinates of the body center of the
+IGBT.</p></li>
+<li><p><strong>EC1_SurfCenter</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Vector of coordinates of the centers of the faces of the
+IGBT.</p></li>
+<li><p><strong>EC2_SurfCenter</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Vector of coordinates of the centers of the faces of the
+Capacitor.</p></li>
+<li><p><strong>EC3_SurfCenter</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Vector of coordinates of the centers of the faces of the
+EMI-filter.</p></li>
+<li><p><strong>EC4_SurfCenter</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Vector of coordinates of the centers of the faces of the
+Control board.</p></li>
+<li><p><strong>EM_start</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Coordinates of the center of the electric motor on one end.</p></li>
+<li><p><strong>EM_end</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Coordinates of the end of the electric motor opposite to EM_start.</p></li>
+<li><p><strong>in1_bauraum</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">double</span></code></span>) – Checks if IGBT is fully inside bauraum.</p></li>
+<li><p><strong>in2_bauraum</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">double</span></code></span>) – Checks if Capacitor is fully inside bauraum.</p></li>
+<li><p><strong>in3_bauraum</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">double</span></code></span>) – Checks if EMI-filter is fully inside bauraum.</p></li>
+<li><p><strong>in4_bauraum</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">double</span></code></span>) – Checks if Control board is fully inside bauraum.</p></li>
+<li><p><strong>out1_gearbox</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">double</span></code></span>) – Checks if IGBT is colliding with gearbox.</p></li>
+<li><p><strong>out2_gearbox</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">double</span></code></span>) – Checks if Capacitor is colliding with gearbox.</p></li>
+<li><p><strong>out3_gearbox</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">double</span></code></span>) – Checks if EMI-filter is colliding with gearbox.</p></li>
+<li><p><strong>out4_gearbox</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">double</span></code></span>) – Checks if Control board is colliding with gearbox.</p></li>
+<li><p><strong>collision12</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">double</span></code></span>) – Checks if IGBT is colliding with Capacitor.</p></li>
+<li><p><strong>collision13</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">double</span></code></span>) – Checks if IGBT is colliding with EMI-filter.</p></li>
+<li><p><strong>collision14</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">double</span></code></span>) – Checks if IGBT is colliding with Control board.</p></li>
+<li><p><strong>collision23</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">double</span></code></span>) – Checks if Capacitor is colliding with EMI-filter.</p></li>
+<li><p><strong>collision24</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">double</span></code></span>) – Checks if Capacitor is colliding with Control board.</p></li>
+<li><p><strong>collision34</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">double</span></code></span>) – Checks if EMI-filter is colliding with Control board.</p></li>
+<li><p><strong>EC2_placement</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Array of logical values that define the position of each individual’s 
+Capacitor with respect of IGBT of said individual.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>Fitness</strong> : Double value with the fitness of individual in
+the population that is currently being evaluated in <a class="reference internal" href="#Optimization.EvaluateFitness" title="Optimization.EvaluateFitness"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">EvaluateFitness()</span></code></a>. Depending on the obtained value from this function fitness can still be modified via <a class="reference internal" href="#Optimization.spline_connection" title="Optimization.spline_connection"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">spline_connection()</span></code></a> and <a class="reference internal" href="#Optimization.spline_connection_gb" title="Optimization.spline_connection_gb"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">spline_connection_gb()</span></code></a></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>double</p>
+</dd>
+</dl>
+<p><strong>Example in Code</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Fitness</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="n">OptimizationFunction</span><span class="p">(</span><span class="n">bauraum_gearbox</span><span class="p">,</span> <span class="n">EC1_center</span><span class="p">,</span> <span class="n">EC1_SurfCenter</span><span class="p">,</span> <span class="n">EC2_SurfCenter</span><span class="p">,</span> <span class="n">EC3_SurfCenter</span><span class="p">,</span> <span class="n">EC4_SurfCenter</span><span class="p">,</span> <span class="n">EM_start</span><span class="p">,</span> <span class="n">EM_end</span><span class="p">,</span> <span class="n">in1_bauraum</span><span class="p">,</span> <span class="n">in2_bauraum</span><span class="p">,</span> <span class="n">in3_bauraum</span><span class="p">,</span> <span class="n">in4_bauraum</span><span class="p">,</span> <span class="n">out1_gearbox</span><span class="p">,</span>  <span class="n">out2_gearbox</span><span class="p">,</span> <span class="n">out3_gearbox</span><span class="p">,</span> <span class="n">out4_gearbox</span><span class="p">,</span> <span class="n">collision12</span><span class="p">,</span> <span class="n">collision13</span><span class="p">,</span> <span class="n">collision14</span><span class="p">,</span> <span class="n">collision23</span><span class="p">,</span> <span class="n">collision24</span><span class="p">,</span> <span class="n">collision34</span><span class="p">,</span> <span class="n">EC2_placement</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="mi">1</span><span class="p">));</span>  
+</pre></div>
+</div>
+</dd></dl>
+</section>
+<section id="point-to-line">
+<h2>Point to line<a class="headerlink" href="#point-to-line" title="Permalink to this headline">¶</a></h2>
+<dl class="mat function">
+<dt class="sig sig-object mat" id="Optimization.point_to_line">
+<span class="sig-prename descclassname"><span class="pre">Optimization.</span></span><span class="sig-name descname"><span class="pre">point_to_line</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">pt</span></em>, <em class="sig-param"><span class="pre">v1</span></em>, <em class="sig-param"><span class="pre">v2</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Optimization.point_to_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function that calculates the perpendicular or shortest distance between an axis and
+a point of a geometry. Used in <a class="reference internal" href="#Optimization.OptimizationFunction" title="Optimization.OptimizationFunction"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">OptimizationFunction()</span></code></a> to calculate
+distance between the center of the IGBT and the Electric Motor axis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pt</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Point of the geometry which its distance to an axis will
+be computed</p></li>
+<li><p><strong>v1</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – First or starting point of the axis.</p></li>
+<li><p><strong>v2</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Second or ending point of the axis</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>d</strong> : Perpendicular or shortest distance between the point and the axis</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>double</p>
+</dd>
+</dl>
+<p><strong>Example in Code</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">distance</span> <span class="o">=</span> <span class="n">point_to_line</span><span class="p">(</span><span class="n">EC1_center</span><span class="p">,</span> <span class="n">EM_start</span><span class="p">,</span><span class="n">EM_end</span><span class="p">);</span>
+</pre></div>
+</div>
+</dd></dl>
+</section>
+<section id="spline-between-components">
+<h2>Spline between components<a class="headerlink" href="#spline-between-components" title="Permalink to this headline">¶</a></h2>
+<dl class="mat function">
+<dt class="sig sig-object mat" id="Optimization.spline_connection">
+<span class="sig-prename descclassname"><span class="pre">Optimization.</span></span><span class="sig-name descname"><span class="pre">spline_connection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">pt1</span></em>, <em class="sig-param"><span class="pre">pt2</span></em>, <em class="sig-param"><span class="pre">pt3</span></em>, <em class="sig-param"><span class="pre">pt4</span></em>, <em class="sig-param"><span class="pre">EC1_center</span></em>, <em class="sig-param"><span class="pre">EC2_center</span></em>, <em class="sig-param"><span class="pre">EC1</span></em>, <em class="sig-param"><span class="pre">EC2</span></em>, <em class="sig-param"><span class="pre">bauraum</span></em>, <em class="sig-param"><span class="pre">cable_radius</span></em>, <em class="sig-param"><span class="pre">radius_of_curvature</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Optimization.spline_connection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function that creates a spline between two Electrical components. Spline generation can be 
+successful or fail depending if it collides with one of the bodies. This result
+as well as the resultant spline length will have impact in the fitness
+value in the current individual in <a class="reference internal" href="#Optimization.EvaluateFitness" title="Optimization.EvaluateFitness"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">EvaluateFitness()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pt1</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – </p></li>
+<li><p><strong>pt2</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – </p></li>
+<li><p><strong>pt3</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – </p></li>
+<li><p><strong>pt4</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – </p></li>
+<li><p><strong>EC1_center</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Vector of coordinates of the body center of the
+IGBT.</p></li>
+<li><p><strong>EC2_center</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Vector of coordinates of the body center of the
+Capacitor.</p></li>
+<li><p><strong>EC1</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">struct</span></code></span>) – struct that represents the IGBT geometry.</p></li>
+<li><p><strong>EC2</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">struct</span></code></span>) – struct that represents the Capacitor geometry.</p></li>
+<li><p><strong>bauraum</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">struct</span></code></span>) – struct that represents the bauraum geometry.</p></li>
+<li><p><strong>cable_radius</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">double</span></code></span>) – </p></li>
+<li><p><strong>radius_of_curvature</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">double</span></code></span>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt><em>[length,max_curvature, curvature, collisionwith1, collisionwith2, Penalty_spline, fn]</em></dt><dd><ul class="simple">
+<li><p><strong>length</strong> :</p></li>
+<li><p><strong>max_curvature</strong> :</p></li>
+<li><p><strong>curvature</strong> :</p></li>
+<li><p><strong>collisionwith1</strong> :</p></li>
+<li><p><strong>collisionwith2</strong> :</p></li>
+<li><p><strong>Penalty_spline,</strong> :</p></li>
+<li><p><strong>fn</strong> :</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<p><strong>Example in Code</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">splinelength</span><span class="p">,</span><span class="n">max_curvature</span><span class="p">,</span> <span class="n">curvature</span><span class="p">,</span> <span class="n">collisionwith1</span><span class="p">,</span> <span class="n">collisionwith2</span><span class="p">,</span> <span class="n">Penalty_spline</span><span class="p">,</span> <span class="n">fn</span><span class="p">]</span> <span class="o">=</span> <span class="n">spline_connection</span> <span class="p">(</span><span class="n">EC1_SurfCenter</span><span class="p">(</span><span class="mi">1</span><span class="p">,:),</span> <span class="n">pt2</span><span class="p">,</span> <span class="n">pt3</span><span class="p">,</span> <span class="n">EC2_SurfCenter</span><span class="p">(</span><span class="mi">2</span><span class="p">,:),</span><span class="n">EC1_center</span><span class="p">,</span> <span class="n">EC2_center</span><span class="p">,</span> <span class="n">EC1</span><span class="p">,</span> <span class="n">EC2</span><span class="p">,</span> <span class="n">bauraum</span><span class="p">,</span> <span class="n">cable_radius</span><span class="p">,</span> <span class="n">radius_of_curvature</span><span class="p">);</span>
+</pre></div>
+</div>
+</dd></dl>
+</section>
+<section id="splines-from-the-gearbox">
+<h2>Splines from the gearbox<a class="headerlink" href="#splines-from-the-gearbox" title="Permalink to this headline">¶</a></h2>
+<dl class="mat function">
+<dt class="sig sig-object mat" id="Optimization.spline_connection_gb">
+<span class="sig-prename descclassname"><span class="pre">Optimization.</span></span><span class="sig-name descname"><span class="pre">spline_connection_gb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">pt1</span></em>, <em class="sig-param"><span class="pre">pt2</span></em>, <em class="sig-param"><span class="pre">pt3</span></em>, <em class="sig-param"><span class="pre">pt4</span></em>, <em class="sig-param"><span class="pre">pt5</span></em>, <em class="sig-param"><span class="pre">pt6</span></em>, <em class="sig-param"><span class="pre">pt7</span></em>, <em class="sig-param"><span class="pre">pt8</span></em>, <em class="sig-param"><span class="pre">pt9</span></em>, <em class="sig-param"><span class="pre">pt10</span></em>, <em class="sig-param"><span class="pre">pt11</span></em>, <em class="sig-param"><span class="pre">pt12</span></em>, <em class="sig-param"><span class="pre">pt13</span></em>, <em class="sig-param"><span class="pre">pt14</span></em>, <em class="sig-param"><span class="pre">pt15</span></em>, <em class="sig-param"><span class="pre">EC1_center</span></em>, <em class="sig-param"><span class="pre">EM_start</span></em>, <em class="sig-param"><span class="pre">EM_end</span></em>, <em class="sig-param"><span class="pre">fv</span></em>, <em class="sig-param"><span class="pre">EC1</span></em>, <em class="sig-param"><span class="pre">cable_radius</span></em>, <em class="sig-param"><span class="pre">radius_of_curvature</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Optimization.spline_connection_gb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function that creates a spline between the gearbox and the IGBT. Spline generation can be 
+successful or fail depending if it collides with one of the bodies. This result
+as well as the resultant spline length will have impact in the fitness
+value in the current individual in <a class="reference internal" href="#Optimization.EvaluateFitness" title="Optimization.EvaluateFitness"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">EvaluateFitness()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pt1</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – </p></li>
+<li><p><strong>pt2</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – </p></li>
+<li><p><strong>pt3</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – </p></li>
+<li><p><strong>pt4</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – </p></li>
+<li><p><strong>pt5</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – </p></li>
+<li><p><strong>pt6</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – </p></li>
+<li><p><strong>pt7</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – </p></li>
+<li><p><strong>pt8</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – </p></li>
+<li><p><strong>pt9</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – </p></li>
+<li><p><strong>pt10</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – </p></li>
+<li><p><strong>pt11</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – </p></li>
+<li><p><strong>pt12</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – </p></li>
+<li><p><strong>pt13</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – </p></li>
+<li><p><strong>pt14</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – </p></li>
+<li><p><strong>pt15</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – </p></li>
+<li><p><strong>EC1_center</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Vector of coordinates of the body center of the
+IGBT.</p></li>
+<li><p><strong>EM_start</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Coordinates of the center of the electric motor.</p></li>
+<li><p><strong>EM_end</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Coordinates of the end of the electric motor opposite to EM_start.</p></li>
+<li><p><strong>fv</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">struct</span></code></span>) – struct that represents the Gearbox geometry.</p></li>
+<li><p><strong>EC1</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">struct</span></code></span>) – struct that represents the IGBT geometry.</p></li>
+<li><p><strong>cale_radius</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">double</span></code></span>) – </p></li>
+<li><p><strong>radius_of_curvature</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">double</span></code></span>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt><em>[length,max_curvature, curvature, collisionwith1, collisionwith2, Penalty_spline, fn]</em></dt><dd><ul class="simple">
+<li><p><strong>length</strong> :</p></li>
+<li><p><strong>max_curvature</strong> :</p></li>
+<li><p><strong>curvature</strong> :</p></li>
+<li><p><strong>collisionwith1</strong> :</p></li>
+<li><p><strong>collisionwith2</strong> :</p></li>
+<li><p><strong>Penalty_spline,</strong> :</p></li>
+<li><p><strong>fn</strong> :</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<p><strong>Example in Code</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">splinelength</span><span class="p">,</span><span class="n">max_curvature</span><span class="p">,</span> <span class="n">curvature</span><span class="p">,</span> <span class="n">collisionwith1</span><span class="p">,</span> <span class="n">collisionwithgb</span><span class="p">,</span><span class="n">fn_mid</span><span class="p">,</span><span class="n">fn_posy</span><span class="p">,</span><span class="n">fn_negy</span><span class="p">]</span> <span class="o">=</span> <span class="n">spline_connection_gb</span> <span class="p">(</span><span class="n">EM_connection</span><span class="p">,</span> <span class="n">EM_connection</span><span class="o">+</span><span class="p">[</span><span class="mi">0</span> <span class="o">-</span><span class="n">clearance_mid</span> <span class="mi">0</span><span class="p">],</span> <span class="n">pt3</span><span class="p">,</span> <span class="n">EC1_SurfCenter</span><span class="p">(</span><span class="mi">2</span><span class="p">,:)</span><span class="o">+</span><span class="p">(</span><span class="n">clearance_mid</span><span class="o">.*</span><span class="n">vector1</span><span class="p">)</span><span class="o">/</span><span class="n">norm</span><span class="p">(</span><span class="n">vector1</span><span class="p">),</span> <span class="n">EC1_SurfCenter</span><span class="p">(</span><span class="mi">2</span><span class="p">,:),</span> <span class="n">pt6</span><span class="p">,</span> <span class="n">pt7</span><span class="p">,</span> <span class="n">pt8</span><span class="p">,</span> <span class="n">pt9</span><span class="p">,</span> <span class="n">pt10</span><span class="p">,</span> <span class="n">pt11</span><span class="p">,</span> <span class="n">pt12</span><span class="p">,</span> <span class="n">pt13</span><span class="p">,</span> <span class="n">pt14</span><span class="p">,</span> <span class="n">pt15</span><span class="p">,</span><span class="n">EC1_center</span><span class="p">,</span> <span class="n">EM_start</span><span class="p">,</span> <span class="n">EM_end</span><span class="p">,</span> <span class="n">gearbox</span><span class="p">,</span> <span class="n">EC1</span><span class="p">,</span>  <span class="n">cable_radius</span><span class="p">,</span> <span class="n">radius_of_curvature</span><span class="p">);</span>
+</pre></div>
+</div>
+</dd></dl>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="Visualization.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Visualization</div>
+              </div>
+              <svg><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="Geometry.html">
+              <svg><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Geometry</div>
+                
+              </div>
+            </a>
+        </div>
+
+        <div class="related-information">
+              Copyright &#169; 2021, Ansari, Dawod, Rueda |
+          Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+          <a href="https://github.com/pradyunsg/furo">Furo theme</a>.
+            | <a class="muted-link" href="_sources/Optimization.rst.txt"
+               rel="nofollow">
+              Show Source
+            </a>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            Contents
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Optimization</a><ul>
+<li><a class="reference internal" href="#evaluate-fitness">Evaluate Fitness</a></li>
+<li><a class="reference internal" href="#initial-population">Initial Population</a></li>
+<li><a class="reference internal" href="#inpolyhedron">INPOLYHEDRON</a></li>
+<li><a class="reference internal" href="#new-generation">New Generation</a></li>
+<li><a class="reference internal" href="#optimization-function">Optimization Function</a></li>
+<li><a class="reference internal" href="#point-to-line">Point to line</a></li>
+<li><a class="reference internal" href="#spline-between-components">Spline between components</a></li>
+<li><a class="reference internal" href="#splines-from-the-gearbox">Splines from the gearbox</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/scripts/furo.js"></script>
+    </body>
+</html>

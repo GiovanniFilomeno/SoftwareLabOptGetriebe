@@ -1,0 +1,16 @@
+.. toctree::
+    :maxdepth: 2
+
+Geometry
+========================
+.. automodule:: Geometry
+
+
+.. mat:autofunction:: ReadGearbox
+
+
+Optimization
+==========================
+.. automodule:: Optimization
+
+
