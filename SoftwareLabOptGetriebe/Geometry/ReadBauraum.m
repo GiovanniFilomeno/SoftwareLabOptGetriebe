@@ -38,15 +38,6 @@ function bauraum = ReadBauraum(file)
 
     %Moving the bauraum to the origin
     bauraum_mov = [xmin ymin zmin];
-    bauraum.vertices = bauraum.vertices - bauraum_mov;
-
-    % xmax = xmax-xmin;
-    % ymax = ymax-ymin;
-    % zmax = zmax-zmin;
-    % xmin=0;
-    % ymin=0;
-    % zmin=0;
-
-    
+    bauraum.vertices = bauraum.vertices - bauraum_mov; 
     
 end

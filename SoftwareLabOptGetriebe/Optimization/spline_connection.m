@@ -1,13 +1,15 @@
 function [length,max_curvature, curvature, collisionwith1, collisionwith2, Penalty_spline, fn] = spline_connection (pt1, pt2, pt3, pt4,EC1_center, EC2_center, EC1, EC2, bauraum, cable_radius, radius_of_curvature)
-% Function that creates a spline between two Electrical components. Spline generation can be 
-% successful or fail depending if it collides with one of the bodies. This result
-% as well as the resultant spline length will have impact in the fitness
-% value in the current individual in :func:`EvaluateFitness`.
+% Function that creates a spline (cable) between two Electrical components. Spline generation can be 
+% successful or unsuccesful depending on whether it collides with one of the bodies. This result
+% as well as the resultant spline length will have an impact on the fitness
+% value of the current individual in :func:`EvaluateFitness`.
 %
-% :param array pt1: 
-% :param array pt2: 
-% :param array pt3: 
-% :param array pt4: 
+% :param array pt1: Connection point to component 1      
+% :param array pt2: Second control point of cable ensuring perpendicularity
+%                   of cable to the component 1
+% :param array pt3: Third control point of cable ensuring perpendicularity
+%                   of cable to the component 2
+% :param array pt4: Connection point to component 2
 % :param array EC1_center: Vector of coordinates of the body center of the
 %                          IGBT.
 % :param array EC2_center: Vector of coordinates of the body center of the
@@ -15,18 +17,25 @@ function [length,max_curvature, curvature, collisionwith1, collisionwith2, Penal
 % :param struct EC1: struct that represents the IGBT geometry.
 % :param struct EC2: struct that represents the Capacitor geometry.
 % :param struct bauraum: struct that represents the bauraum geometry.
-% :param double cable_radius:
-% :param double radius_of_curvature:
+% :param double cable_radius: Radius of the prescribed cable
+% :param double radius_of_curvature: Minimum allowable radius of curvature 
+%                                    of the prescribed cable 
 %
 % :return:
 %   *[length,max_curvature, curvature, collisionwith1, collisionwith2, Penalty_spline, fn]*
-%      - **length** :
-%      - **max_curvature** :
-%      - **curvature** :
-%      - **collisionwith1** :
-%      - **collisionwith2** :
-%      - **Penalty_spline,** :
-%      - **fn** :
+%      - **length** : Length of the spline.
+%      - **max_curvature** : Max curvature of the spline.
+%      - **curvature** : Array with curvature values of segments of the
+%        spline.
+%      - **collisionwith1** : Percentage of collision between spline and
+%        first EC.
+%      - **collisionwith2** : Percentage of collision between spline and
+%        second EC.
+%      - **Penalty_spline,** : Penalty to be applied to the fitness of that
+%        individual. Can be either 0 or 1000 depending if the spline was
+%        successfully created
+%      - **fn** : Function that describes the spline so it can be plotted
+%        with the :func:`Visualize`.
 %
 %
 % **Example in Code**
@@ -38,59 +47,45 @@ function [length,max_curvature, curvature, collisionwith1, collisionwith2, Penal
 
 
 
-
+% initial set values for collision
 collisionwith1 = 1;
 collisionwith2 = 1;
 collisionwithbauraum = 0;
 
+% determining intermediate control points
 vector = pt3-pt2;
 pt2a = pt2 + 0.25 .* vector ;
 pt2b = pt2 + 0.5 .* vector ;
 pt2c = pt2 + 0.75 .* vector ;
 
+% control points vector
 xyz = [pt1; pt2; pt2a; pt2b; pt2c; pt3; pt4];
-% patch(EC1,'FaceColor',       [0.8 0 0], ...
-%     'EdgeColor',       'green',        ...
-%     'FaceLighting',    'gouraud',     ...
-%     'AmbientStrength', 0.15);
-% 
-% patch(EC2,'FaceColor',       [0 0.8 0], ...
-%     'EdgeColor',       'red',        ...
-%     'FaceLighting',    'gouraud',     ...
-%     'AmbientStrength', 0.15);
-% hold on
-% view([45 90 135]);
-% xlabel('X') 
-% ylabel('Y')
-% zlabel('Z')
-%axis([0 10 0 10 0 10])
-% camlight('headlight');
-% material('default');
-% scatter3(pt1(1),pt1(2),pt1(3),'o','y');
-% scatter3(pt4(1),pt4(2),pt4(3),'o','y');
 
-% plot3(xyz(:,1),xyz(:,2),xyz(:,3),'yo','LineWidth',2);
-% text(xyz,[repmat('  ',4,1), num2str((1:4)')])
 ax = gca;
 ax.XTick = [];
 ax.YTick = [];
 ax.ZTick = [];
-% xyz = [x ;y ;z];
-% hold on  
 
+% initial iteration value
 iteration = 0;
+% set initial maximum curvature
 max_curvature = 0.5;
+% Enter iteration loop in case of collisions or curvature violation
 while (collisionwith1>0 || collisionwith2>0 || collisionwithbauraum<1 || max_curvature<(1/radius_of_curvature) || iteration < 30)
-%xyz = [pt1; pt2; pt3; pt4];
-iteration = iteration+1;
 
+% iteration update
+iteration = iteration+1;
+% vector direction to shift control point 2a in direction parallel to line
+% joining point and the component 1 centre
 vector1 = pt2a-EC1_center;
  vector1 = vector1 / norm(vector1);
+% vector direction to shift control point 2c in direction parallel to line
+% joining point and the component 2 centre
 vector2 = pt2c-EC2_center;
  vector2 = vector2 / norm(vector2);
+% vector direction to shift control point 2b in direction perpendicular to
+% line joining the centres of the components
  midptvector = EC2_center - EC1_center;
-% vector3 = vector3 / norm(vector3);
-%vector3 = point_to_line(pt2b, EC1_center, EC2_center);
 ptcentervector = pt2b - EC1_center;
 C = dot(ptcentervector, midptvector);
 C = (C / (norm(midptvector))^2)*midptvector;
@@ -98,23 +93,12 @@ ptonline = EC1_center + C;
 vector3 = pt2b - ptonline;
 vector3 = vector3 / norm(vector3);
 
-% pt2a = pt2a +[1 -1 1] ;
-% pt2b = pt2b +[0 0 1]  ;
-% pt2c = pt2c +[-1 -1 1] ;
+% Update the control points locations
 pt2a = pt2a + 0.5*vector1 ;
 pt2b = pt2b + 0.5*vector3  ;
 pt2c = pt2c + 0.5*vector2 ;
-
+% updated control points vector
 xyz = [pt1; pt2; pt2a; pt2b; pt2c; pt3; pt4];
-
-% plot3(xyz(:,1),xyz(:,2),xyz(:,3),'ro','LineWidth',2);
-% % text(xyz,[repmat('  ',4,1), num2str((1:4)')])
-% ax = gca;
-% ax.XTick = [];
-% ax.YTick = [];
-% ax.ZTick = [];
-% % xyz = [x ;y ;z];
-% hold on
 
 %spline generation 
 Spline = cscvn(xyz');
@@ -145,26 +129,29 @@ fnprime = fnder(fn);
 Lfun = @(s) sqrt(sum(fnval(fnprime,s).^2,1));
 length = integral(Lfun,fn.breaks(1),fn.breaks(end));
 
-
+% Vectors to store collision and curvature values
 curvature = [];
 collision1 = [];
 collision2 = [];
 collisionbauraum = [];
 
 
-
+% Discretize the spline to check for collision and curvature
     for i=1:Spline.pieces
-        
+            %Obtaining the cartesian coordinates from parametric form
              x = Spline.coefs(i*Spline.dim-2,:);
              y = Spline.coefs(i*Spline.dim-1,:);
              z = Spline.coefs(i*Spline.dim,:);
+            %Obtaining the first derivative from parametric form
             D_x = D_Spline.coefs(i*Spline.dim-2,:);
             D_y = D_Spline.coefs(i*Spline.dim-1,:);
             D_z = D_Spline.coefs(i*Spline.dim,:);
+            %Obtaining the second derivative from parametric form
             DD_x = DD_Spline.coefs(i*Spline.dim-2,:);
             DD_y = DD_Spline.coefs(i*Spline.dim-1,:);
             DD_z = DD_Spline.coefs(i*Spline.dim,:);
             
+            % discretization
             t1 = Spline.breaks(i);
             t2 = Spline.breaks(i+1);
             increment = (t2-t1)/19;
@@ -178,35 +165,37 @@ collisionbauraum = [];
                 DD_x_t =  DD_x(1)*(t-Spline.breaks(i)) + DD_x(2);
                 DD_y_t =  DD_y(1)*(t-Spline.breaks(i)) + DD_y(2);
                 DD_z_t =  DD_z(1)*(t-Spline.breaks(i)) + DD_z(2);
-                               
+                % curvature calculation               
                 k = sqrt(((DD_z_t)*(D_y_t) - (DD_y_t)*(D_z_t))^2 +((DD_x_t)*(D_z_t) - (DD_z_t)*(D_x_t))^2 +((DD_y_t)*(D_x_t) - (DD_x_t)*(D_y_t))^2 )/((D_x_t)^2 + (D_y_t)^2 +(D_z_t)^2)^1.5;
                 curvature(end+1) = k; 
                 
-                
+                % collision check at each point
                 collision1(end+1) = inpolyhedron(EC1, [x_t y_t z_t]);
                 collision2(end+1) = inpolyhedron(EC2, [x_t y_t z_t]);
                 collisionbauraum(end+1) = inpolyhedron(bauraum, [x_t y_t z_t]);
             end
 
     end
-
+% saving curvature values
 max_curvature = max(curvature); 
 max_curvature_index = find(curvature == max_curvature);
-%max_curvature_positions
 
+% total collision
 collisionwith1 = sum(collision1)/size(collision1,2);
 collisionwith2 = sum(collision2)/size(collision2,2);
 collisionwithbauraum = sum(collisionbauraum)/size(collisionbauraum,2);
 
+% Loop exit in case of no collisions and allowable curvature or maximum iterations
     if (collisionwith1<0.01 && collisionwith2<0.01 && collisionwithbauraum>0.99 && max_curvature>(1/radius_of_curvature) || iteration == 30)
         Penalty_spline = 0;
         if iteration == 10
             Penalty_spline = 1000;
         end
+        % Accomodating cable radius
         pt2a = pt2a + cable_radius*vector1 ;
         pt2b = pt2b + cable_radius*vector3  ;
         pt2c = pt2c + cable_radius*vector2 ;
-
+        % final spline control points
         xyz = [pt1; pt2; pt2a; pt2b; pt2c; pt3; pt4];
         fn = cscvn(xyz');
         
@@ -215,34 +204,14 @@ collisionwithbauraum = sum(collisionbauraum)/size(collisionbauraum,2);
 
 
 end
+% final spline control points
 xyz = [pt1; pt2; pt2a; pt2b; pt2c; pt3; pt4];
-% patch(EC1,'FaceColor',       [0.8 0 0], ...
-%     'EdgeColor',       'green',        ...
-%     'FaceLighting',    'gouraud',     ...
-%     'AmbientStrength', 0.15);
-% 
-% patch(EC2,'FaceColor',       [0 0.8 0], ...
-%     'EdgeColor',       'red',        ...
-%     'FaceLighting',    'gouraud',     ...
-%     'AmbientStrength', 0.15);
-% hold on
-% view([45 90 135]);
-% xlabel('X') 
-% ylabel('Y')
-% zlabel('Z')
-% %axis([0 10 0 10 0 10])
-% camlight('headlight');
-% material('default');
-% scatter3(pt1(1),pt1(2),pt1(3),'o','red');
-% scatter3(pt4(1),pt4(2),pt4(3),'o','red');
-% fnplt(fn,'r',2);
-%plot3(xyz(:,1),xyz(:,2),xyz(:,3),'ro','LineWidth',2);
-% text(xyz,[repmat('  ',4,1), num2str((1:4)')])
+
 ax = gca;
 ax.XTick = [];
 ax.YTick = [];
 ax.ZTick = [];
-% xyz = [x ;y ;z];
+
 hold on  
 end
 

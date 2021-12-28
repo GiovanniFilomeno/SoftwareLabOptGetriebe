@@ -49,7 +49,6 @@ function [EC,EC_length,EC_width,EC_height,EC_center, EC_SurfCenter] = ReadEC(fil
     
     EC_SurfCenter = zeros(4,3);
 
-
     EC_SurfCenter(1,:) = [EC_xmax (EC_ymax + EC_ymin)/2 (EC_zmax + EC_zmin)/2]; %Counterclockwise
 
     EC_SurfCenter(2,:) = [EC_xmin (EC_ymax + EC_ymin)/2 (EC_zmax + EC_zmin)/2]; %Clockwise

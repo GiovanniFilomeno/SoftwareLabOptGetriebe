@@ -548,17 +548,19 @@ be computed</p></li>
 <dl class="mat function">
 <dt class="sig sig-object mat" id="Optimization.spline_connection">
 <span class="sig-prename descclassname"><span class="pre">Optimization.</span></span><span class="sig-name descname"><span class="pre">spline_connection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">pt1</span></em>, <em class="sig-param"><span class="pre">pt2</span></em>, <em class="sig-param"><span class="pre">pt3</span></em>, <em class="sig-param"><span class="pre">pt4</span></em>, <em class="sig-param"><span class="pre">EC1_center</span></em>, <em class="sig-param"><span class="pre">EC2_center</span></em>, <em class="sig-param"><span class="pre">EC1</span></em>, <em class="sig-param"><span class="pre">EC2</span></em>, <em class="sig-param"><span class="pre">bauraum</span></em>, <em class="sig-param"><span class="pre">cable_radius</span></em>, <em class="sig-param"><span class="pre">radius_of_curvature</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Optimization.spline_connection" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function that creates a spline between two Electrical components. Spline generation can be 
-successful or fail depending if it collides with one of the bodies. This result
-as well as the resultant spline length will have impact in the fitness
-value in the current individual in <a class="reference internal" href="#Optimization.EvaluateFitness" title="Optimization.EvaluateFitness"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">EvaluateFitness()</span></code></a>.</p>
+<dd><p>Function that creates a spline (cable) between two Electrical components. Spline generation can be 
+successful or unsuccesful depending on whether it collides with one of the bodies. This result
+as well as the resultant spline length will have an impact on the fitness
+value of the current individual in <a class="reference internal" href="#Optimization.EvaluateFitness" title="Optimization.EvaluateFitness"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">EvaluateFitness()</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>pt1</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – </p></li>
-<li><p><strong>pt2</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – </p></li>
-<li><p><strong>pt3</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – </p></li>
-<li><p><strong>pt4</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – </p></li>
+<li><p><strong>pt1</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Connection point to component 1</p></li>
+<li><p><strong>pt2</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Second control point of cable ensuring perpendicularity
+of cable to the component 1</p></li>
+<li><p><strong>pt3</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Third control point of cable ensuring perpendicularity
+of cable to the component 2</p></li>
+<li><p><strong>pt4</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Connection point to component 2</p></li>
 <li><p><strong>EC1_center</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Vector of coordinates of the body center of the
 IGBT.</p></li>
 <li><p><strong>EC2_center</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Vector of coordinates of the body center of the
@@ -566,20 +568,27 @@ Capacitor.</p></li>
 <li><p><strong>EC1</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">struct</span></code></span>) – struct that represents the IGBT geometry.</p></li>
 <li><p><strong>EC2</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">struct</span></code></span>) – struct that represents the Capacitor geometry.</p></li>
 <li><p><strong>bauraum</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">struct</span></code></span>) – struct that represents the bauraum geometry.</p></li>
-<li><p><strong>cable_radius</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">double</span></code></span>) – </p></li>
-<li><p><strong>radius_of_curvature</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">double</span></code></span>) – </p></li>
+<li><p><strong>cable_radius</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">double</span></code></span>) – Radius of the prescribed cable</p></li>
+<li><p><strong>radius_of_curvature</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">double</span></code></span>) – Minimum allowable radius of curvature 
+of the prescribed cable</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><dl class="simple">
 <dt><em>[length,max_curvature, curvature, collisionwith1, collisionwith2, Penalty_spline, fn]</em></dt><dd><ul class="simple">
-<li><p><strong>length</strong> :</p></li>
-<li><p><strong>max_curvature</strong> :</p></li>
-<li><p><strong>curvature</strong> :</p></li>
-<li><p><strong>collisionwith1</strong> :</p></li>
-<li><p><strong>collisionwith2</strong> :</p></li>
-<li><p><strong>Penalty_spline,</strong> :</p></li>
-<li><p><strong>fn</strong> :</p></li>
+<li><p><strong>length</strong> : Length of the spline.</p></li>
+<li><p><strong>max_curvature</strong> : Max curvature of the spline.</p></li>
+<li><p><strong>curvature</strong> : Array with curvature values of segments of the
+spline.</p></li>
+<li><p><strong>collisionwith1</strong> : Percentage of collision between spline and
+first EC.</p></li>
+<li><p><strong>collisionwith2</strong> : Percentage of collision between spline and
+second EC.</p></li>
+<li><p><strong>Penalty_spline,</strong> : Penalty to be applied to the fitness of that
+individual. Can be either 0 or 1000 depending if the spline was
+successfully created</p></li>
+<li><p><strong>fn</strong> : Function that describes the spline so it can be plotted
+with the <code class="xref mat mat-func docutils literal notranslate"><span class="pre">Visualize()</span></code>.</p></li>
 </ul>
 </dd>
 </dl>
@@ -604,41 +613,58 @@ value in the current individual in <a class="reference internal" href="#Optimiza
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>pt1</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – </p></li>
-<li><p><strong>pt2</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – </p></li>
-<li><p><strong>pt3</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – </p></li>
-<li><p><strong>pt4</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – </p></li>
-<li><p><strong>pt5</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – </p></li>
-<li><p><strong>pt6</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – </p></li>
-<li><p><strong>pt7</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – </p></li>
-<li><p><strong>pt8</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – </p></li>
-<li><p><strong>pt9</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – </p></li>
-<li><p><strong>pt10</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – </p></li>
-<li><p><strong>pt11</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – </p></li>
-<li><p><strong>pt12</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – </p></li>
-<li><p><strong>pt13</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – </p></li>
-<li><p><strong>pt14</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – </p></li>
-<li><p><strong>pt15</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – </p></li>
+<li><p><strong>pt1</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Connection point of middle cable to Electric Motor</p></li>
+<li><p><strong>pt2</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Second control point of middle cable ensuring perpendicularity
+of cable to the Electric Motor</p></li>
+<li><p><strong>pt3</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Third control point of middle cable ensuring turnaround
+the motor without collision</p></li>
+<li><p><strong>pt4</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Fourth control point of middle cable ensuring perpendicularity
+of cable to the component</p></li>
+<li><p><strong>pt5</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Connection point of middle cable to component</p></li>
+<li><p><strong>pt6</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Connection point of right cable to Electric Motor</p></li>
+<li><p><strong>pt7</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Second control point of right cable ensuring perpendicularity
+of cable to the Electric Motor</p></li>
+<li><p><strong>pt8</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Third control point of right cable ensuring turnaround
+the motor without collision</p></li>
+<li><p><strong>pt9</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Fourth control point of right cable ensuring perpendicularity
+of cable to the component</p></li>
+<li><p><strong>pt10</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Connection point of right cable to component</p></li>
+<li><p><strong>pt11</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Connection point of left cable to Electric Motor</p></li>
+<li><p><strong>pt12</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Second control point of left cable ensuring perpendicularity
+of cable to the Electric Motor</p></li>
+<li><p><strong>pt13</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Third control point of left cable ensuring turnaround
+the motor without collision</p></li>
+<li><p><strong>pt14</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Fourth control point of left cable ensuring perpendicularity
+of cable to the component</p></li>
+<li><p><strong>pt15</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Connection point of left cable to component</p></li>
 <li><p><strong>EC1_center</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Vector of coordinates of the body center of the
 IGBT.</p></li>
 <li><p><strong>EM_start</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Coordinates of the center of the electric motor.</p></li>
 <li><p><strong>EM_end</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">array</span></code></span>) – Coordinates of the end of the electric motor opposite to EM_start.</p></li>
 <li><p><strong>fv</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">struct</span></code></span>) – struct that represents the Gearbox geometry.</p></li>
 <li><p><strong>EC1</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">struct</span></code></span>) – struct that represents the IGBT geometry.</p></li>
-<li><p><strong>cale_radius</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">double</span></code></span>) – </p></li>
-<li><p><strong>radius_of_curvature</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">double</span></code></span>) – </p></li>
+<li><p><strong>cale_radius</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">double</span></code></span>) – Radius of the prescribed cables</p></li>
+<li><p><strong>radius_of_curvature</strong> (<span><code class="xref mat mat-obj docutils literal notranslate"><span class="pre">double</span></code></span>) – Minimum allowable radius of curvature 
+of the prescribed cables</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><dl class="simple">
 <dt><em>[length,max_curvature, curvature, collisionwith1, collisionwith2, Penalty_spline, fn]</em></dt><dd><ul class="simple">
-<li><p><strong>length</strong> :</p></li>
-<li><p><strong>max_curvature</strong> :</p></li>
-<li><p><strong>curvature</strong> :</p></li>
-<li><p><strong>collisionwith1</strong> :</p></li>
-<li><p><strong>collisionwith2</strong> :</p></li>
-<li><p><strong>Penalty_spline,</strong> :</p></li>
-<li><p><strong>fn</strong> :</p></li>
+<li><p><strong>length</strong> : Length of the spline.</p></li>
+<li><p><strong>max_curvature_mid</strong> : Max curvature of the spline.</p></li>
+<li><p><strong>curvature_mid</strong> : Array with curvature values of segments of the
+spline.</p></li>
+<li><p><strong>collisionwith1_mid</strong> : Percentage of collision between spline and
+first EC.</p></li>
+<li><p><strong>collisionwithgb_mid</strong> : Percentage of collision between spline and
+second EC.</p></li>
+<li><p><strong>fn_mid</strong> : Function that describes the middle spline so it can be plotted
+with the <code class="xref mat mat-func docutils literal notranslate"><span class="pre">Visualize()</span></code>.</p></li>
+<li><p><strong>fn_posy</strong> : Function that describes the left spline so it can be plotted
+with the <code class="xref mat mat-func docutils literal notranslate"><span class="pre">Visualize()</span></code>.</p></li>
+<li><p><strong>fn_negy</strong> : Function that describes the right spline so it can be plotted
+with the <code class="xref mat mat-func docutils literal notranslate"><span class="pre">Visualize()</span></code>.</p></li>
 </ul>
 </dd>
 </dl>

@@ -28,10 +28,7 @@ function [EM_start, EM_vector, Anchor, ElectricMotorRadius] = FindingAxis(file)
     end
     %%Reads STL file and obtains vertices, Faces and Normal Vectors within the geometry
     FV = stlread(file);
-    %FV = stlread("C:\Users\ahmed\OneDrive\Desktop\Software Lab\Matlab Files\Current\Gearbox1.stl");
-    %FV = stlread("C:\Users\ahmed\OneDrive\Desktop\Software Lab\Matlab Files\Current\Gearbox1(Rotated1).stl");
-    %FV = stlread("C:\Users\ahmed\OneDrive\Desktop\Software Lab\Matlab Files\Current\Gearbox1(Rotated2).stl");
-
+    
     V = 1000*FV.Points;  %%Obtains Vertices matrix
     F = FV.ConnectivityList;    %Obtains Faces Matrix
     N = faceNormal(FV); %Obtains Matrix of normal vectors
@@ -43,10 +40,10 @@ function [EM_start, EM_vector, Anchor, ElectricMotorRadius] = FindingAxis(file)
     NumberOfVertices = length(V);
     NumberOfNormalVectors = length(N);
 
-    %% Render
-    % The model is rendered with a PATCH graphics object. We also add some dynamic
-    % lighting, and adjust the material properties to change the specular
-    % highlighting.
+%% Render
+% The model is rendered with a PATCH graphics object. We also add some dynamic
+% lighting, and adjust the material properties to change the specular
+% highlighting.
 
 %     patch(fv,'FaceColor',       [0.8 0.8 1.0], ...
 %              'EdgeColor',       'none',        ...
@@ -283,7 +280,7 @@ function [EM_start, EM_vector, Anchor, ElectricMotorRadius] = FindingAxis(file)
                         if ((abs(CylinderCenters_Y_coordinates(k) - StartingAxisY)) > tolerance) && (k ~= MotorIndex) % && (j~=k)
                             DistanceBetweenAxes = sqrt(( StartingAxisY - CylinderCenters_Y_coordinates(k))^2 + (StartingAxisZ-CylinderCenters_Z_coordinates(k))^2);
                                 if ((((Radius(Counter_CurvedSurfaces)+ Radius(k))- DistanceBetweenAxes ) > 0) && (abs(MinX(k)-MinX(Counter_CurvedSurfaces))<tolerance)&& (k~= LastCylinderID)) %&& (( DistanceBetweenAxes - (Radius(j)+ Radius(k))) > -0.01) 
-%                                     fprintf('main cylinder is number %i and other cylinder is number %i \n',Counter_CurvedSurfaces,k)
+%                                   fprintf('main cylinder is number %i and other cylinder is number %i \n',Counter_CurvedSurfaces,k)
                                     StartingAxisY = CylinderCenters_Y_coordinates(k);
                                     StartingAxisZ = CylinderCenters_Z_coordinates(k);
                                     LastCylinderID = k;
@@ -330,16 +327,17 @@ function [EM_start, EM_vector, Anchor, ElectricMotorRadius] = FindingAxis(file)
                         if ((abs(CylinderCenters_X_coordinates(k) - StartingAxisX)) > tolerance) && (k ~= MotorIndex)
                             DistanceBetweenAxes = sqrt(( StartingAxisX - CylinderCenters_X_coordinates(k))^2 + (StartingAxisZ-CylinderCenters_Z_coordinates(k))^2);
                                 if ((((Radius(Counter_CurvedSurfaces)+ Radius(k))- DistanceBetweenAxes ) > 0) && (abs(MinY(k)-MinY(Counter_CurvedSurfaces))<tolerance)&& (k~= LastCylinderID))
-%                                     fprintf('main cylinder is number %i and other cylinder is number %i \n',Counter_CurvedSurfaces,k)
+%                                   fprintf('main cylinder is number %i and other cylinder is number %i \n',Counter_CurvedSurfaces,k)
                                     StartingAxisX = CylinderCenters_X_coordinates(k);
                                     StartingAxisZ = CylinderCenters_Z_coordinates(k);
                                     LastCylinderID = k;
-                                 end
+                                end
                         end
                     end
                 end 
             end
         end
+        
         yvector = linspace(MinY_Abs -50, MaxY_Abs + 50);
         %line(CylinderCenters_X_coordinates(LastCylinderID)*ones(1,length(yvector)),yvector,CylinderCenters_Z_coordinates(LastCylinderID)*ones(1,length(yvector)),'color','red');
         OutputShaftAxisY = [CylinderCenters_X_coordinates(LastCylinderID),CylinderCenters_Z_coordinates(LastCylinderID)];
@@ -377,7 +375,7 @@ function [EM_start, EM_vector, Anchor, ElectricMotorRadius] = FindingAxis(file)
                     if ((abs(CylinderCenters_X_coordinates(k) - StartingAxisX)) > tolerance) && (k ~= MotorIndex) 
                         DistanceBetweenAxes = sqrt(( StartingAxisX - CylinderCenters_X_coordinates(k))^2 + (StartingAxisY-CylinderCenters_Y_coordinates(k))^2);
                             if ((((Radius(Counter_CurvedSurfaces)+ Radius(k))- DistanceBetweenAxes ) > 0) && (abs(MinZ(k)-MinZ(Counter_CurvedSurfaces))<tolerance)&& (k~= LastCylinderID)) 
-%                                 fprintf('main cylinder is number %i and other cylinder is number %i \n',Counter_CurvedSurfaces,k)
+%                               fprintf('main cylinder is number %i and other cylinder is number %i \n',Counter_CurvedSurfaces,k)
                                 StartingAxisX = CylinderCenters_X_coordinates(k);
                                 StartingAxisY = CylinderCenters_Y_coordinates(k);
                                 LastCylinderID = k;

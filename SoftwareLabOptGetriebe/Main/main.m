@@ -1,5 +1,7 @@
-% Main script of the project, run to start optimization process. The script
-% will ask the user to enter the population size as well as the number of
+% **IMPORTANT** : Before running this script, please add the Main, Geometry, Optimization and Visualization folders inside SoftwareLabOptGetriebe to the MATLAB Path.
+%
+%Main script of the project, which is run to start optimization process. The 
+% script will ask the user to enter the population size as well as the number of
 % generations that the algorithm will run. Once it runs, the script will
 % display every time a generation is finished along with the fitness of the
 % best individual of that generation.
@@ -29,10 +31,10 @@ gearbox = ReadGearbox('Gearbox1.stl');
 bauraum = ReadBauraum('Bauraum.stl');
 
 %Read Electric components and define its limits
-[EC1,EC1_length,EC1_width,EC1_height,EC1_center, EC1_SurfCenter] = ReadEC('EC1.stl');
-[EC2,EC2_length,EC2_width,EC2_height,EC2_center, EC2_SurfCenter] = ReadEC('EC2.stl');
-[EC3,EC3_length,EC3_width,EC3_height,EC3_center, EC3_SurfCenter] = ReadEC('EC3.stl');
-[EC4,EC4_length,EC4_width,EC4_height,EC4_center, EC4_SurfCenter] = ReadEC('EC4.stl');
+[EC1,EC1_length,EC1_width,EC1_height,EC1_center, EC1_SurfCenter] = ReadEC('EC1.STL');
+[EC2,EC2_length,EC2_width,EC2_height,EC2_center, EC2_SurfCenter] = ReadEC('EC2.STL');
+[EC3,EC3_length,EC3_width,EC3_height,EC3_center, EC3_SurfCenter] = ReadEC('EC3.STL');
+[EC4,EC4_length,EC4_width,EC4_height,EC4_center, EC4_SurfCenter] = ReadEC('EC4.STL');
 
 %% Positioning of the gearbox inside the bauraum
 [EM_start, EM_vector, Anchor, EM_radius] = FindingAxis("Gearbox1.stl");
@@ -92,9 +94,5 @@ Best(iter,1) = Best_fitness;
 Mean(iter,1) = Mean_fitness;
 Iterations = 1:iter;
 fprintf('Fitness of Generation %d: %d \n',iter,srt(1,1));
-%figure(iter+1)
-%hold on
-plot(Iterations,Best,Iterations,Mean);
-
 
 tEnd = cputime - tStart

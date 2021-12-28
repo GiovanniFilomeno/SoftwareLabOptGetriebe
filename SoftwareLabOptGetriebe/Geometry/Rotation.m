@@ -1,6 +1,7 @@
+
 function vertex = Rotation(V, anchor,indice, angle)
 % Function used to rotate the vertices of a geometry along a specified
-% coordinate axis with regard of an anchor point for a defined value of
+% coordinate axis with regard of an anchor point for a defined value in
 % radians.
 %
 % :param double V: Vertices of the geometry to be rotated.

@@ -1,8 +1,8 @@
 function [gearbox, Anchor, EM_start, EM_vector, EM_end, rad_range] = PositionGearbox(bauraum,gearbox,EM_start, EM_vector, Anchor, point, zero)
 % Function that reads the bauraum and gearbox structs and aligns their axis
-% to be in the same location and position. Once is positioned correctly,
-% also calculates the amount of rotation the gearbox can make along its shaft without going
-% out of the bauraum.
+% to be in the same location and position. Once positioning is done correctly,
+% it also calculates the amount of rotation the gearbox can undergo along its shaft 
+% without going out of the bauraum.
 %
 % :param struct bauraum: struct that represents the Bauraum geometry.
 % :param struct gearbox: struct that represents the Gearbox geometry.
@@ -130,8 +130,5 @@ end
 gearbox.vertices = Rotation(gearbox.vertices,Anchor, 2, first_angle);
 EM_start = Rotation(EM_start, Anchor, 2, first_angle);
 EM_end = EM_start + EM_vector;
-
-
-
 
 end

@@ -237,9 +237,9 @@ shaft, which will be used for rotations.</p></li>
 <dt class="sig sig-object mat" id="Geometry.PositionGearbox">
 <span class="sig-prename descclassname"><span class="pre">Geometry.</span></span><span class="sig-name descname"><span class="pre">PositionGearbox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">bauraum</span></em>, <em class="sig-param"><span class="pre">gearbox</span></em>, <em class="sig-param"><span class="pre">EM_start</span></em>, <em class="sig-param"><span class="pre">EM_vector</span></em>, <em class="sig-param"><span class="pre">Anchor</span></em>, <em class="sig-param"><span class="pre">point</span></em>, <em class="sig-param"><span class="pre">zero</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Geometry.PositionGearbox" title="Permalink to this definition">¶</a></dt>
 <dd><p>Function that reads the bauraum and gearbox structs and aligns their axis
-to be in the same location and position. Once is positioned correctly,
-also calculates the amount of rotation the gearbox can make along its shaft without going
-out of the bauraum.</p>
+to be in the same location and position. Once positioning is done correctly,
+it also calculates the amount of rotation the gearbox can undergo along its shaft 
+without going out of the bauraum.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -385,7 +385,7 @@ the component, used to calculate distance between components.</p></li>
 <dt class="sig sig-object mat" id="Geometry.Rotation">
 <span class="sig-prename descclassname"><span class="pre">Geometry.</span></span><span class="sig-name descname"><span class="pre">Rotation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">V</span></em>, <em class="sig-param"><span class="pre">anchor</span></em>, <em class="sig-param"><span class="pre">indice</span></em>, <em class="sig-param"><span class="pre">angle</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Geometry.Rotation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Function used to rotate the vertices of a geometry along a specified
-coordinate axis with regard of an anchor point for a defined value of
+coordinate axis with regard of an anchor point for a defined value in
 radians.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
